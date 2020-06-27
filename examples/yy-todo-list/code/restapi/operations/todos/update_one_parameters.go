@@ -6,6 +6,7 @@ package todos
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -58,8 +59,10 @@ func (o *UpdateOneParams) BindRequest(r *http.Request, route *middleware.Matched
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
+			// TODO yy: Create Ctx param
+			ctx := context.TODO()
 			// validate body object
-			if err := body.Validate(route.Formats); err != nil {
+			if err := body.Validate(ctx, route.Formats); err != nil {
 				res = append(res, err)
 			}
 

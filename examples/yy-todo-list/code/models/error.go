@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -26,7 +28,8 @@ type Error struct {
 }
 
 // Validate validates this error
-func (m *Error) Validate(formats strfmt.Registry) error {
+// TODO yy: remove general case
+func (m *Error) Validate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateMessage(formats); err != nil {

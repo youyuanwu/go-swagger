@@ -93,7 +93,7 @@
       {{- if and .IsNullable (not .IsMapNullOverride) }}
     if {{ .ValueExpression }} != nil {
       {{- end }}
-      if err := {{.ValueExpression }}.Validate(formats); err != nil {
+      if err := {{.ValueExpression }}.Validate(ctx, formats); err != nil {
         if ve, ok := err.(*errors.Validation); ok {
           return ve.ValidateName({{ if .Path }}{{ .Path }}{{ else }}""{{ end }})
         }
@@ -127,7 +127,7 @@
               {{- if and .IsNullable (not .IsMapNullOverride) }}
         if val != nil {
               {{- end }}
-          if err := val.Validate(formats); err != nil {
+          if err := val.Validate(ctx, formats); err != nil {
               return err
           }
               {{- if and .IsNullable (not .IsMapNullOverride) }}
@@ -175,7 +175,7 @@
             {{- if and .IsNullable (not .IsMapNullOverride) }}
       if val != nil {
             {{- end }}
-          if err := val.Validate(formats); err != nil {
+          if err := val.Validate(ctx, formats); err != nil {
               return err
           }
             {{- if and .IsNullable (not .IsMapNullOverride) }}
@@ -224,7 +224,7 @@
         if {{ .ValueExpression }} != nil {
           {{- end }}
         {{- end }}
-          if err := {{ if $.IsMap }}val{{ else }}{{ .ValueExpression }}{{ end }}.Validate(formats); err != nil {
+          if err := {{ if $.IsMap }}val{{ else }}{{ .ValueExpression }}{{ end }}.Validate(ctx, formats); err != nil {
               return err
           }
         {{- if and .IsNullable (not .IsMapNullOverride) }}
@@ -263,7 +263,7 @@
       {{- if and .IsNullable (not .IsMapNullOverride) }}
       if {{ .ValueExpression }} != nil {
       {{- end }}
-      if err := {{.ValueExpression }}.Validate(formats); err != nil {
+      if err := {{.ValueExpression }}.Validate(ctx, formats); err != nil {
         if ve, ok := err.(*errors.Validation); ok {
           return ve.ValidateName({{ if .Path }}{{ .Path }}{{ else }}""{{ end }})
         }
@@ -408,7 +408,8 @@ func ({{ .ReceiverName }} *{{ if .IsExported }}{{ pascalize .Name }}{{ else }}{{
     {{- end }}
   {{ end }}
 // Validate validates this {{ humanize .Name }}
-func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalProperties }}*{{ end }}{{ if .Discriminates }}{{ camelize .Name }}{{ else if .IsExported }}{{ pascalize .Name }}{{ else }}{{ .Name }}{{ end }}) Validate(formats strfmt.Registry) error {
+// TODO yy: remove general case
+func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalProperties }}*{{ end }}{{ if .Discriminates }}{{ camelize .Name }}{{ else if .IsExported }}{{ pascalize .Name }}{{ else }}{{ .Name }}{{ end }}) Validate(ctx context.Context, formats strfmt.Registry) error {
   var res []error
 
   {{ range .AllOf }}
@@ -434,7 +435,7 @@ func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalPropert
       }
       {{ end }}
     {{- else if (or .Required .HasValidations) }}
-      if err := {{ .ReceiverName }}.{{ pascalize (dropPackage .GoType) }}.Validate(formats); err != nil {
+      if err := {{ .ReceiverName }}.{{ pascalize (dropPackage .GoType) }}.Validate(ctx, formats); err != nil {
         res = append(res, err)
       }
     {{- end }}

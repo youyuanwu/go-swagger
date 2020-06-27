@@ -4,6 +4,7 @@ package restapi
 
 import (
 	"crypto/tls"
+	"log"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -35,11 +36,16 @@ func configureAPI(api *operations.SimpleToDoListAPI) http.Handler {
 	api.JSONProducer = runtime.JSONProducer()
 
 	// Applies when the "x-todolist-token" header is set
-	if api.KeyAuth == nil {
-		api.KeyAuth = func(token string) (interface{}, error) {
-			return nil, errors.NotImplemented("api key auth (key) x-todolist-token from header param [x-todolist-token] has not yet been implemented")
+	//if api.KeyAuth == nil {
+	api.KeyAuth = func(token string) (interface{}, error) {
+		log.Printf("key is %v", token)
+		if token == "123" {
+			return true, nil
 		}
+		return nil, errors.New(401, "wrong key")
+		//return nil, errors.NotImplemented("api key auth (key) x-todolist-token from header param [x-todolist-token] has not yet been implemented")
 	}
+	//}
 
 	// Set your custom authorizer if needed. Default one is security.Authorized()
 	// Expected interface runtime.Authorizer

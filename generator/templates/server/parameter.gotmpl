@@ -3,8 +3,10 @@
 
 {{ define "bodyvalidator" }}
   {{- if .HasModelBodyParams }}
+  // TODO yy: Create Ctx param
+  ctx := context.TODO()
   // validate body object{{/* delegate validation to model object */}}
-  if err := body.Validate(route.Formats); err != nil {
+  if err := body.Validate(ctx, route.Formats); err != nil {
     res = append(res, err)
   }
 
@@ -33,7 +35,9 @@
         {{- end }}
     }
       {{- end }}
-    if err := body[{{ .IndexVar }}].Validate(route.Formats); err != nil {
+    // TODO yy: Create Ctx array
+    ctx := context.TODO()
+    if err := body[{{ .IndexVar }}].Validate(ctx, route.Formats); err != nil {
       res = append(res, err)
       break
     }
@@ -73,7 +77,9 @@
         {{- if and .IsNullable (not .IsMapNullOverride) }}
         if val != nil {
         {{- end }}
-        if err := val.Validate(route.Formats); err != nil {
+        // TODO yy: Create Ctx param map
+        ctx := context.TODO()
+        if err := val.Validate(ctx, route.Formats); err != nil {
             res = append(res, err)
             break
         }
