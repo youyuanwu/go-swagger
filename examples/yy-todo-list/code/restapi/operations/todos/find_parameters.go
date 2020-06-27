@@ -6,6 +6,7 @@ package todos
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -40,6 +41,7 @@ type FindParams struct {
 	XRateLimit int32
 	/*
 	  Required: true
+	  Minimum: 0
 	  In: formData
 	*/
 	Limit int32
@@ -135,6 +137,21 @@ func (o *FindParams) bindLimit(rawData []string, hasKey bool, formats strfmt.Reg
 		return errors.InvalidType("limit", "formData", "int32", raw)
 	}
 	o.Limit = value
+
+	ctx := context.TODO() // This is a ctx placeholder for future use
+	if err := o.validateLimit(ctx, formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateLimit carries on validations for parameter Limit
+func (o *FindParams) validateLimit(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := validate.MinimumInt("limit", "formData", int64(o.Limit), 0, false); err != nil {
+		return err
+	}
 
 	return nil
 }

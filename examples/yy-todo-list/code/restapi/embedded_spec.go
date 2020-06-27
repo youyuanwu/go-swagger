@@ -214,11 +214,20 @@ func init() {
         },
         "description": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "pattern": "xyx-*-xyz"
+        },
+        "description2": {
+          "type": "string",
+          "enum": [
+            "a",
+            "b"
+          ]
         },
         "id": {
           "type": "integer",
           "format": "int64",
+          "maximum": 10,
           "readOnly": true
         }
       }
@@ -278,6 +287,7 @@ func init() {
         "operationId": "find",
         "parameters": [
           {
+            "minimum": 0,
             "type": "integer",
             "format": "int32",
             "name": "limit",
@@ -437,11 +447,20 @@ func init() {
         },
         "description": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "pattern": "xyx-*-xyz"
+        },
+        "description2": {
+          "type": "string",
+          "enum": [
+            "a",
+            "b"
+          ]
         },
         "id": {
           "type": "integer",
           "format": "int64",
+          "maximum": 10,
           "readOnly": true
         }
       }

@@ -60,6 +60,7 @@ func (o *UpdateOneParams) BindRequest(r *http.Request, route *middleware.Matched
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
 			// TODO yy: Create Ctx param
+			// body validation method has (ctx formats) as signature while params do not
 			ctx := context.TODO()
 			// validate body object
 			if err := body.Validate(ctx, route.Formats); err != nil {

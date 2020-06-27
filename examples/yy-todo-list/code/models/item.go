@@ -7,6 +7,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -25,10 +26,16 @@ type Item struct {
 	// description
 	// Required: true
 	// Min Length: 1
+	// Pattern: xyx-*-xyz
 	Description *string `json:"description"`
+
+	// description2
+	// Enum: [a b]
+	Description2 string `json:"description2,omitempty"`
 
 	// id
 	// Read Only: true
+	// Maximum: 10
 	ID int64 `json:"id,omitempty"`
 }
 
@@ -37,7 +44,15 @@ type Item struct {
 func (m *Item) Validate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateDescription(formats); err != nil {
+	if err := m.validateDescription(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDescription2(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateID(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -47,13 +62,73 @@ func (m *Item) Validate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Item) validateDescription(formats strfmt.Registry) error {
+func (m *Item) validateDescription(ctx context.Context, formats strfmt.Registry) error {
 
 	if err := validate.Required("description", "body", m.Description); err != nil {
 		return err
 	}
 
 	if err := validate.MinLength("description", "body", string(*m.Description), 1); err != nil {
+		return err
+	}
+
+	if err := validate.Pattern("description", "body", string(*m.Description), `xyx-*-xyz`); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var itemTypeDescription2PropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["a","b"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		itemTypeDescription2PropEnum = append(itemTypeDescription2PropEnum, v)
+	}
+}
+
+const (
+
+	// ItemDescription2A captures enum value "a"
+	ItemDescription2A string = "a"
+
+	// ItemDescription2B captures enum value "b"
+	ItemDescription2B string = "b"
+)
+
+// prop value enum
+func (m *Item) validateDescription2Enum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, itemTypeDescription2PropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Item) validateDescription2(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Description2) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateDescription2Enum("description2", "body", m.Description2); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Item) validateID(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ID) { // not required
+		return nil
+	}
+
+	if err := validate.MaximumInt("id", "body", int64(m.ID), 10, false); err != nil {
 		return err
 	}
 

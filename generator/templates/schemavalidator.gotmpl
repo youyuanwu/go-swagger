@@ -421,7 +421,7 @@ func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalPropert
 
       {{ range .Properties }}
         {{ if and (ne $.DiscriminatorField .Name) (or .Required .HasValidations) }}
-          if err := {{.ReceiverName }}.validate{{ pascalize .Name }}(formats); err != nil {
+          if err := {{.ReceiverName }}.validate{{ pascalize .Name }}(ctx, formats); err != nil {
             res = append(res, err)
           }
         {{- end }}
@@ -430,7 +430,7 @@ func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalPropert
         {{ template "mapvalidator" . }}
       {{- end }}
       {{ if and .IsTuple .AdditionalItems }}
-      if err := {{ .ReceiverName }}.validate{{ pascalize .Name }}Items(formats); err != nil {
+      if err := {{ .ReceiverName }}.validate{{ pascalize .Name }}Items(ctx, formats); err != nil {
         res = append(res, err)
       }
       {{ end }}
@@ -443,7 +443,7 @@ func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalPropert
   {{ template "fieldvalidator" . }}
   {{ range .Properties }}
     {{ if and (ne $.DiscriminatorField .Name) (or .Required .HasValidations) }}
-      if err := {{.ReceiverName }}.validate{{ pascalize .Name }}(formats); err != nil {
+      if err := {{.ReceiverName }}.validate{{ pascalize .Name }}(ctx, formats); err != nil {
         res = append(res, err)
       }
     {{ end }}
@@ -452,7 +452,7 @@ func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalPropert
     {{ template "mapvalidator" . }}
   {{- end }}
   {{ if and .IsTuple .AdditionalItems }}{{/* validates additionalItems in a tuple */}}
-    if err := {{ .ReceiverName }}.validate{{ pascalize .Name }}Items(formats); err != nil {
+    if err := {{ .ReceiverName }}.validate{{ pascalize .Name }}Items(ctx, formats); err != nil {
       res = append(res, err)
     }
   {{ end }}
@@ -569,7 +569,7 @@ func ({{ .ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else 
       {{ end }}
 
       {{ if and (ne $.DiscriminatorField .Name) (or .Required .HasValidations) }}
-func ({{.ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else if $.IsExported }}{{ pascalize $.Name }}{{ else }}{{ $.Name }}{{ end }}) validate{{ pascalize .Name }}(formats strfmt.Registry) error {
+func ({{.ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else if $.IsExported }}{{ pascalize $.Name }}{{ else }}{{ $.Name }}{{ end }}) validate{{ pascalize .Name }}(ctx context.Context, formats strfmt.Registry) error {
         {{ if not .Required }}
   if swag.IsZero({{ .ValueExpression }}) { // not required
     return nil
@@ -677,7 +677,7 @@ func ({{ .ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else 
         {{ end }}
 
 
-func ({{.ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else if $.IsExported }}{{ pascalize $.Name }}{{ else }}{{ $.Name }}{{ end }}) validate{{ pascalize .Name }}(formats strfmt.Registry) error {
+func ({{.ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else if $.IsExported }}{{ pascalize $.Name }}{{ else }}{{ $.Name }}{{ end }}) validate{{ pascalize .Name }}(ctx context.Context, formats strfmt.Registry) error {
         {{ if not .Required }}
   if swag.IsZero({{ .ValueExpression }}) { // not required
     return nil
@@ -712,7 +712,7 @@ func ({{ .ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else 
   return nil
 }
     {{ end }}
-func ({{.ReceiverName }} *{{ pascalize .Name }}) validate{{ pascalize .Name }}Items(formats strfmt.Registry) error {
+func ({{.ReceiverName }} *{{ pascalize .Name }}) validate{{ pascalize .Name }}Items(ctx context.Context, formats strfmt.Registry) error {
     {{ if or .AdditionalItems.Required .AdditionalItems.HasValidations }}
   for {{ .IndexVar }} := range {{ .ValueExpression }}.{{ pascalize .Name }}Items {
       {{template "propertyvalidator" .AdditionalItems }}

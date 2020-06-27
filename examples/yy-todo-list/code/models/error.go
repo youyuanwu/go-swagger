@@ -32,7 +32,7 @@ type Error struct {
 func (m *Error) Validate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateMessage(formats); err != nil {
+	if err := m.validateMessage(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -42,7 +42,7 @@ func (m *Error) Validate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Error) validateMessage(formats strfmt.Registry) error {
+func (m *Error) validateMessage(ctx context.Context, formats strfmt.Registry) error {
 
 	if err := validate.Required("message", "body", m.Message); err != nil {
 		return err

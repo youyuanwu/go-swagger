@@ -4,6 +4,7 @@
 {{ define "bodyvalidator" }}
   {{- if .HasModelBodyParams }}
   // TODO yy: Create Ctx param
+  // body validation method has (ctx formats) as signature while params do not
   ctx := context.TODO()
   // validate body object{{/* delegate validation to model object */}}
   if err := body.Validate(ctx, route.Formats); err != nil {
@@ -179,7 +180,7 @@ if err := validate.EnumCase(
     {{ varname .ValueExpression }} := *(value.(*{{.GoType}}))
   {{- else if and .IsComplexObject .HasValidations }}{{/* dedicated to nested body params */}}
   {{ varname .ValueExpression }} := {{ varname .ValueExpression }}V
-  if err := {{ .ValueExpression }}.Validate(formats) ; err != nil {
+  if err := {{ .ValueExpression }}.Validate(ctx, formats) ; err != nil {
     if ve, ok := err.(*errors.Validation); ok {
       return ve.ValidateName({{ .Path }})
     }
@@ -555,7 +556,9 @@ func ({{ .ReceiverName }} *{{ $className }}Params) bind{{ pascalize .ID }}(rawDa
   {{ .ValueExpression }} = {{ if or .IsArray .HasDiscriminator .IsFileParam .IsStream (not .IsNullable) }}*{{ end }}(value.(*{{ .GoType }}))
       {{else}}{{ .ValueExpression }} = {{ if .IsNullable }}&{{ end }}raw
       {{ end }}
-      {{if .HasValidations }}if err := {{ .ReceiverName }}.validate{{ pascalize .ID }}(formats); err != nil {
+      {{if .HasValidations }}
+  ctx := context.TODO() // This is a ctx placeholder for future use
+  if err := {{ .ReceiverName }}.validate{{ pascalize .ID }}(ctx, formats); err != nil {
     return err
   }
       {{ end }}
@@ -592,7 +595,7 @@ func ({{ .ReceiverName }} *{{ $className }}Params) bind{{ pascalize .ID }}(rawDa
       {{ template "sliceparambinder" . }}
   {{ .ValueExpression }} = {{ varname .Child.ValueExpression }}R
       {{- if .HasSliceValidations }}
-  if err := {{ .ReceiverName }}.validate{{ pascalize .ID }}(formats); err != nil {
+  if err := {{ .ReceiverName }}.validate{{ pascalize .ID }}(ctx, formats); err != nil {
     return err
   }
       {{- end }}
@@ -602,7 +605,7 @@ func ({{ .ReceiverName }} *{{ $className }}Params) bind{{ pascalize .ID }}(rawDa
     {{ end }}
     {{ if or (and (not .IsArray) .HasValidations) (and .IsArray .HasSliceValidations) }}
 // validate{{ pascalize .ID }} carries on validations for parameter {{ .ID }}
-func ({{ .ReceiverName }} *{{ $className }}Params) validate{{ pascalize .ID }}(formats strfmt.Registry) error {
+func ({{ .ReceiverName }} *{{ $className }}Params) validate{{ pascalize .ID }}(ctx context.Context, formats strfmt.Registry) error {
   {{ template "propertyparamvalidator" . }}
   return nil
 }
@@ -611,7 +614,7 @@ func ({{ .ReceiverName }} *{{ $className }}Params) validate{{ pascalize .ID }}(f
     {{- if and .HasSimpleBodyParams (not .HasModelBodyItems) (not .HasModelBodyMap) }}
       {{- if .Schema.HasValidations }}
 // validate{{ pascalize .ID }}Body validates an inline body parameter
-func ({{ .ReceiverName }} *{{ $className }}Params) validate{{ pascalize .ID }}Body(formats strfmt.Registry) error {
+func ({{ .ReceiverName }} *{{ $className }}Params) validate{{ pascalize .ID }}Body(ctx context.Context, formats strfmt.Registry) error {
         {{- if .IsArray }}
           {{- if .HasSliceValidations }}
               {{- template "sliceparamvalidator" . }}

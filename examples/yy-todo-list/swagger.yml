@@ -44,6 +44,7 @@ paths:
           in: formData
           type: integer
           format: int32
+          minimum: 0
           required: true
           allowEmptyValue: true
         - name: "X-Rate-Limit"
@@ -131,9 +132,16 @@ definitions:
         type: integer
         format: int64
         readOnly: true
+        maximum: 10
       description:
         type: string
         minLength: 1
+        pattern: "xyx-*-xyz"
+      description2:
+        type: string
+        enum:
+          - a
+          - b
       completed:
         type: boolean
   error:
