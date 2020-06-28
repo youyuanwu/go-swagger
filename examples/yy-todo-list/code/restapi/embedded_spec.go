@@ -234,20 +234,23 @@ func init() {
           "type": "array",
           "items": {
             "type": "object",
+            "required": [
+              "sliceItemNameReadOnly"
+            ],
             "properties": {
-              "Child": {
+              "sliceItemContent": {
                 "type": "object",
                 "properties": {
                   "Age": {
                     "type": "integer"
                   },
-                  "ChildNameReadOnly": {
+                  "ContentNameReadOnly": {
                     "type": "string",
                     "readOnly": true
                   }
                 }
               },
-              "nameReadOnly": {
+              "sliceItemNameReadOnly": {
                 "type": "string",
                 "readOnly": true
               }
@@ -448,32 +451,35 @@ func init() {
   "definitions": {
     "ItemSliceItems0": {
       "type": "object",
+      "required": [
+        "sliceItemNameReadOnly"
+      ],
       "properties": {
-        "Child": {
+        "sliceItemContent": {
           "type": "object",
           "properties": {
             "Age": {
               "type": "integer"
             },
-            "ChildNameReadOnly": {
+            "ContentNameReadOnly": {
               "type": "string",
               "readOnly": true
             }
           }
         },
-        "nameReadOnly": {
+        "sliceItemNameReadOnly": {
           "type": "string",
           "readOnly": true
         }
       }
     },
-    "ItemSliceItems0Child": {
+    "ItemSliceItems0SliceItemContent": {
       "type": "object",
       "properties": {
         "Age": {
           "type": "integer"
         },
-        "ChildNameReadOnly": {
+        "ContentNameReadOnly": {
           "type": "string",
           "readOnly": true
         }

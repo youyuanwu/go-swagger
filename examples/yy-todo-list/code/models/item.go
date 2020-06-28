@@ -138,9 +138,8 @@ func (m *Item) validateID(ctx context.Context, formats strfmt.Registry) error {
 		return nil
 	}
 
-	// READONLY HERE primative
-	// WIP yy: move to pkg
-	// READONLY HERE 4 primitive
+	// WIP yy: move to pkg, elevate to ptr
+	// READONLY HERE primitive
 	if err := func(ctx context.Context, path string, in string, data interface{}) error {
 		if v := ctx.Value("operation-type"); v != nil {
 			if s, ok := v.(string); ok {
@@ -173,13 +172,23 @@ func (m *Item) validateSlice(ctx context.Context, formats strfmt.Registry) error
 		return nil
 	}
 
-	// READONLY HERE 5
+	// READONLY HERE This shows up. WIP: use same validation function as primitivefieldvalidator
 
 	for i := 0; i < len(m.Slice); i++ {
 		if swag.IsZero(m.Slice[i]) { // not required
 			continue
 		}
 
+		// DEBUG
+		// .Name: slice
+		// .IsAliased: false
+		// .IsAnonymous: false
+		// .IsNullable: true
+		// .Required: false
+		// .ReadOnly: false
+		// .IsBaseType: false
+		// .ValueExpression: m.Slice[i]
+		// .ReceiverName: m
 		if m.Slice[i] != nil {
 			if err := m.Slice[i].Validate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
@@ -217,12 +226,13 @@ func (m *Item) UnmarshalBinary(b []byte) error {
 // swagger:model ItemSliceItems0
 type ItemSliceItems0 struct {
 
-	// child
-	Child *ItemSliceItems0Child `json:"Child,omitempty"`
+	// slice item content
+	SliceItemContent *ItemSliceItems0SliceItemContent `json:"sliceItemContent,omitempty"`
 
-	// name read only
+	// slice item name read only
+	// Required: true
 	// Read Only: true
-	NameReadOnly string `json:"nameReadOnly,omitempty"`
+	SliceItemNameReadOnly string `json:"sliceItemNameReadOnly"`
 }
 
 // Validate validates this item slice items0
@@ -230,7 +240,11 @@ type ItemSliceItems0 struct {
 func (m *ItemSliceItems0) Validate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateChild(ctx, formats); err != nil {
+	if err := m.validateSliceItemContent(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateSliceItemNameReadOnly(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -240,19 +254,59 @@ func (m *ItemSliceItems0) Validate(ctx context.Context, formats strfmt.Registry)
 	return nil
 }
 
-func (m *ItemSliceItems0) validateChild(ctx context.Context, formats strfmt.Registry) error {
+func (m *ItemSliceItems0) validateSliceItemContent(ctx context.Context, formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Child) { // not required
+	if swag.IsZero(m.SliceItemContent) { // not required
 		return nil
 	}
 
-	if m.Child != nil {
-		if err := m.Child.Validate(ctx, formats); err != nil {
+	// DEBUG
+	// .Name: sliceItemContent
+	// .IsAliased: false
+	// .IsAnonymous: false
+	// .IsNullable: true
+	// .Required: false
+	// .ReadOnly: false
+	// .IsBaseType: false
+	// .ValueExpression: m.SliceItemContent
+	// .ReceiverName: m
+	if m.SliceItemContent != nil {
+		if err := m.SliceItemContent.Validate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("Child")
+				return ve.ValidateName("sliceItemContent")
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *ItemSliceItems0) validateSliceItemNameReadOnly(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := validate.RequiredString("sliceItemNameReadOnly", "body", string(m.SliceItemNameReadOnly)); err != nil {
+		return err
+	}
+
+	// WIP yy: move to pkg, elevate to ptr
+	// READONLY HERE primitive
+	if err := func(ctx context.Context, path string, in string, data interface{}) error {
+		if v := ctx.Value("operation-type"); v != nil {
+			if s, ok := v.(string); ok {
+				if s != "Request" {
+					// pass not request
+					return nil
+				}
+				if !swag.IsZero(data) {
+					return errors.New(400, fmt.Sprintf("ReadOnly field %v found in %v", in, path))
+				}
+			}
+			return nil
+		}
+		// operation type not set so skip validating
+		return nil
+	}(ctx, "sliceItemNameReadOnly", "body", m.SliceItemNameReadOnly); err != nil {
+		return err
 	}
 
 	return nil
@@ -276,27 +330,66 @@ func (m *ItemSliceItems0) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-// ItemSliceItems0Child item slice items0 child
+// ItemSliceItems0SliceItemContent item slice items0 slice item content
 //
-// swagger:model ItemSliceItems0Child
-type ItemSliceItems0Child struct {
+// swagger:model ItemSliceItems0SliceItemContent
+type ItemSliceItems0SliceItemContent struct {
 
 	// age
 	Age int64 `json:"Age,omitempty"`
 
-	// child name read only
+	// content name read only
 	// Read Only: true
-	ChildNameReadOnly string `json:"ChildNameReadOnly,omitempty"`
+	ContentNameReadOnly string `json:"ContentNameReadOnly,omitempty"`
 }
 
-// Validate validates this item slice items0 child
-// TODO yy: remove 1 No validation case
-func (m *ItemSliceItems0Child) Validate(ctx context.Context, formats strfmt.Registry) error {
+// Validate validates this item slice items0 slice item content
+// TODO yy: remove general case
+func (m *ItemSliceItems0SliceItemContent) Validate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateContentNameReadOnly(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ItemSliceItems0SliceItemContent) validateContentNameReadOnly(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ContentNameReadOnly) { // not required
+		return nil
+	}
+
+	// WIP yy: move to pkg, elevate to ptr
+	// READONLY HERE primitive
+	if err := func(ctx context.Context, path string, in string, data interface{}) error {
+		if v := ctx.Value("operation-type"); v != nil {
+			if s, ok := v.(string); ok {
+				if s != "Request" {
+					// pass not request
+					return nil
+				}
+				if !swag.IsZero(data) {
+					return errors.New(400, fmt.Sprintf("ReadOnly field %v found in %v", in, path))
+				}
+			}
+			return nil
+		}
+		// operation type not set so skip validating
+		return nil
+	}(ctx, "sliceItemContent"+"."+"ContentNameReadOnly", "body", m.ContentNameReadOnly); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *ItemSliceItems0Child) MarshalBinary() ([]byte, error) {
+func (m *ItemSliceItems0SliceItemContent) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -304,8 +397,8 @@ func (m *ItemSliceItems0Child) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ItemSliceItems0Child) UnmarshalBinary(b []byte) error {
-	var res ItemSliceItems0Child
+func (m *ItemSliceItems0SliceItemContent) UnmarshalBinary(b []byte) error {
+	var res ItemSliceItems0SliceItemContent
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

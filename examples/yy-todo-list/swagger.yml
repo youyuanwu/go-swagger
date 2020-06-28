@@ -131,7 +131,7 @@ definitions:
       id:
         type: integer
         format: int64
-        readOnly: true
+        readOnly: true  # this works
         maximum: 10
       description:
         type: string
@@ -146,21 +146,22 @@ definitions:
         type: boolean
       slice:
         type: array
-        readOnly: true
+        readOnly: true  # this works
         items:
           type: object
-          #required:
-          #  - Child
+          required:
+            - sliceItemNameReadOnly
           properties:
-            nameReadOnly: # this is not showing up
+            sliceItemNameReadOnly: # this shows up
               type: string
               readOnly: true
-            Child:
+            sliceItemContent:
               type: object
+              # readOnly: true
               properties: 
-                ChildNameReadOnly:
+                ContentNameReadOnly: # this shows up
                   type: string
-                  readOnly: true
+                  readOnly: true # not showing
                 Age:
                   type: integer
 

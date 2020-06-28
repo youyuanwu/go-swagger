@@ -267,15 +267,16 @@
 {{ end }}
 
 {{define "objectvalidator" }}
-  {{/* // DEBUG
+  // DEBUG
   // .Name: {{ .Name }}
   // .IsAliased: {{ .IsAliased }}
   // .IsAnonymous: {{ .IsAnonymous }}
   // .IsNullable: {{ .IsNullable }}
   // .Required: {{ .Required }}
+  // .ReadOnly: {{ .ReadOnly }}
   // .IsBaseType: {{ .IsBaseType }}
   // .ValueExpression: {{ .ValueExpression }}
-  // .ReceiverName: {{ .ReceiverName }} */}}
+  // .ReceiverName: {{ .ReceiverName }}
   {{- if not .IsAnonymous }}
     {{- if and .Required (or .IsNullable .IsBaseType) }}
       if err := validate.Required({{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{.ValueExpression }}); err != nil {
