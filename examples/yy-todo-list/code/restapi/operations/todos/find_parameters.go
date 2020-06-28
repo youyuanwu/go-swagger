@@ -138,7 +138,7 @@ func (o *FindParams) bindLimit(rawData []string, hasKey bool, formats strfmt.Reg
 	}
 	o.Limit = value
 
-	ctx := context.TODO() // This is a ctx placeholder for future use
+	ctx := context.TODO() // ctx here is a placeholder for future use
 	if err := o.validateLimit(ctx, formats); err != nil {
 		return err
 	}

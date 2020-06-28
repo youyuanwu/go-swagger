@@ -3,9 +3,9 @@
 
 {{ define "bodyvalidator" }}
   {{- if .HasModelBodyParams }}
-  // TODO yy: Create Ctx param
-  // body validation method has (ctx formats) as signature while params do not
-  ctx := context.TODO()
+  // WIP yy: declare ctx key type {{/*ctx is used for passing the operation type to validate readOnly properties*/}}
+  // WIP yy: move to open-api validate pkg and declare methods to create and extract ctx
+  ctx := context.WithValue(context.Background(), "operation-type", "Request")
   // validate body object{{/* delegate validation to model object */}}
   if err := body.Validate(ctx, route.Formats); err != nil {
     res = append(res, err)
@@ -36,8 +36,8 @@
         {{- end }}
     }
       {{- end }}
-    // TODO yy: Create Ctx array
-    ctx := context.TODO()
+    // WIP yy: declare context key type
+    ctx := context.WithValue(context.Background(), "operation-type", "Request")
     if err := body[{{ .IndexVar }}].Validate(ctx, route.Formats); err != nil {
       res = append(res, err)
       break
@@ -78,8 +78,8 @@
         {{- if and .IsNullable (not .IsMapNullOverride) }}
         if val != nil {
         {{- end }}
-        // TODO yy: Create Ctx param map
-        ctx := context.TODO()
+        // WIP yy: Create Ctx param map
+        ctx := context.WithValue(context.Background(), "operation-type", "Request")
         if err := val.Validate(ctx, route.Formats); err != nil {
             res = append(res, err)
             break
@@ -557,7 +557,7 @@ func ({{ .ReceiverName }} *{{ $className }}Params) bind{{ pascalize .ID }}(rawDa
       {{else}}{{ .ValueExpression }} = {{ if .IsNullable }}&{{ end }}raw
       {{ end }}
       {{if .HasValidations }}
-  ctx := context.TODO() // This is a ctx placeholder for future use
+  ctx := context.TODO() // ctx here is a placeholder for future use
   if err := {{ .ReceiverName }}.validate{{ pascalize .ID }}(ctx, formats); err != nil {
     return err
   }
