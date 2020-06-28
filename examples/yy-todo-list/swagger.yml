@@ -26,9 +26,9 @@ securityDefinitions:
 security:
   - key: []
 consumes:
-  - application/io.swagger.examples.todo-list.v1+json
+  - application/json
 produces:
-  - application/io.swagger.examples.todo-list.v1+json
+  - application/json
 schemes:
   - http
   - https
@@ -144,6 +144,26 @@ definitions:
           - b
       completed:
         type: boolean
+      slice:
+        type: array
+        readOnly: true
+        items:
+          type: object
+          #required:
+          #  - Child
+          properties:
+            nameReadOnly: # this is not showing up
+              type: string
+              readOnly: true
+            Child:
+              type: object
+              properties: 
+                ChildNameReadOnly:
+                  type: string
+                  readOnly: true
+                Age:
+                  type: integer
+
   error:
     type: object
     required:

@@ -20,10 +20,10 @@
 //  Contact: go-openapi maintainers<nowhere@example.com> https://github.com/go-openapi
 //
 //  Consumes:
-//    - application/io.swagger.examples.todo-list.v1+json
+//    - application/json
 //
 //  Produces:
-//    - application/io.swagger.examples.todo-list.v1+json
+//    - application/json
 //
 // swagger:meta
 package restapi

@@ -8,6 +8,8 @@ package models
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -37,6 +39,10 @@ type Item struct {
 	// Read Only: true
 	// Maximum: 10
 	ID int64 `json:"id,omitempty"`
+
+	// slice
+	// Read Only: true
+	Slice []*ItemSliceItems0 `json:"slice"`
 }
 
 // Validate validates this item
@@ -53,6 +59,10 @@ func (m *Item) Validate(ctx context.Context, formats strfmt.Registry) error {
 	}
 
 	if err := m.validateID(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateSlice(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -128,8 +138,57 @@ func (m *Item) validateID(ctx context.Context, formats strfmt.Registry) error {
 		return nil
 	}
 
+	// READONLY HERE primative
+	// WIP yy: move to pkg
+	// READONLY HERE 4 primitive
+	if err := func(ctx context.Context, path string, in string, data interface{}) error {
+		if v := ctx.Value("operation-type"); v != nil {
+			if s, ok := v.(string); ok {
+				if s != "Request" {
+					// pass not request
+					return nil
+				}
+				if !swag.IsZero(data) {
+					return errors.New(400, fmt.Sprintf("ReadOnly field %v found in %v", in, path))
+				}
+			}
+			return nil
+		}
+		// operation type not set so skip validating
+		return nil
+	}(ctx, "id", "body", m.ID); err != nil {
+		return err
+	}
+
 	if err := validate.MaximumInt("id", "body", int64(m.ID), 10, false); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (m *Item) validateSlice(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Slice) { // not required
+		return nil
+	}
+
+	// READONLY HERE 5
+
+	for i := 0; i < len(m.Slice); i++ {
+		if swag.IsZero(m.Slice[i]) { // not required
+			continue
+		}
+
+		if m.Slice[i] != nil {
+			if err := m.Slice[i].Validate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("slice" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -146,6 +205,107 @@ func (m *Item) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *Item) UnmarshalBinary(b []byte) error {
 	var res Item
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// ItemSliceItems0 item slice items0
+//
+// swagger:model ItemSliceItems0
+type ItemSliceItems0 struct {
+
+	// child
+	Child *ItemSliceItems0Child `json:"Child,omitempty"`
+
+	// name read only
+	// Read Only: true
+	NameReadOnly string `json:"nameReadOnly,omitempty"`
+}
+
+// Validate validates this item slice items0
+// TODO yy: remove general case
+func (m *ItemSliceItems0) Validate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateChild(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ItemSliceItems0) validateChild(ctx context.Context, formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Child) { // not required
+		return nil
+	}
+
+	if m.Child != nil {
+		if err := m.Child.Validate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("Child")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *ItemSliceItems0) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *ItemSliceItems0) UnmarshalBinary(b []byte) error {
+	var res ItemSliceItems0
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// ItemSliceItems0Child item slice items0 child
+//
+// swagger:model ItemSliceItems0Child
+type ItemSliceItems0Child struct {
+
+	// age
+	Age int64 `json:"Age,omitempty"`
+
+	// child name read only
+	// Read Only: true
+	ChildNameReadOnly string `json:"ChildNameReadOnly,omitempty"`
+}
+
+// Validate validates this item slice items0 child
+// TODO yy: remove 1 No validation case
+func (m *ItemSliceItems0Child) Validate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *ItemSliceItems0Child) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *ItemSliceItems0Child) UnmarshalBinary(b []byte) error {
+	var res ItemSliceItems0Child
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

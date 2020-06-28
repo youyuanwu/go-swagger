@@ -4,6 +4,28 @@
     return err
   }
   {{ end }}
+  {{- if .ReadOnly }}
+  // WIP yy: move to pkg, elevate to ptr
+  // READONLY HERE primitive 
+	if err := func(ctx context.Context, path string, in string, data interface{}) error {
+		if v := ctx.Value("operation-type"); v != nil {
+			if s, ok := v.(string); ok {
+				if s != "Request" {
+					// pass not request
+					return nil
+				}
+				if !swag.IsZero(data) {
+					return errors.New(400, fmt.Sprintf("ReadOnly field %v found in %v", in, path))
+				}
+			}
+			return nil
+		}
+		// operation type not set so skip validating
+		return nil
+	}(ctx, {{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{ .ValueExpression }}); err != nil {
+		return err
+	}
+  {{- end }}
   {{ if .MinLength }}
   if err := validate.MinLength({{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, string({{ if .IsNullable }}*{{ end }}{{.ValueExpression }}), {{.MinLength }}); err != nil {
     return err
@@ -51,6 +73,9 @@
       return err
     }
   {{ end }}
+  {{- if .ReadOnly }}
+  // READONLY HERE This shows up. WIP: use same validation function as primitivefieldvalidator
+  {{- end }}
   {{ if or .MinItems .MaxItems }}
     {{ .IndexVar }}{{ pascalize .Name }}Size := int64(len({{.ValueExpression }}))
   {{ end }}
@@ -156,6 +181,9 @@
   if err := validate.Required{{ if and (eq .GoType "string") (not .IsNullable) }}String{{ end }}({{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{ if not (or .IsAnonymous .IsNullable) }}{{ .GoType }}({{ end }}{{.ValueExpression }}{{ if not (or .IsAnonymous .IsNullable) }}){{ end }}); err != nil {
     return err
   }
+          {{- end }}
+          {{- if .ReadOnly }}
+  // READONLY HERE 6 WIP: test this, not showing up
           {{- end }}
           {{- if and (not .IsStream) (not .IsBase64) }}{{/* TODO: IsStream and CustomFormattershould be mutually exclusive in type resolver */}}
             {{ template "validationCustomformat" . }}
@@ -302,6 +330,9 @@
     return err
   }
     {{- end }}
+    {{- if .ReadOnly }}
+  // READONLY HERE custom fmt WIP: not tested
+    {{- end }}
     {{- if and (not .IsStream) (not .IsBase64) }}
       {{ template "validationCustomformat" . }}
     {{- end }}
@@ -322,6 +353,9 @@
   if err := validate.Required{{ if and (eq .GoType "string") (not .IsNullable) }}String{{ end }}({{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{ if not (or .IsAnonymous .IsNullable) }}{{ .GoType }}({{ end }}{{.ValueExpression }}{{ if not (or .IsAnonymous .IsNullable) }}){{ end }}); err != nil {
     return err
   }
+    {{- end }}
+    {{- if .ReadOnly }}
+  // READONLY HERE WIP: not tested custom fmt
     {{- end }}
     {{- if and (not .IsStream) (not .IsBase64) }}
       {{ template "validationCustomformat" . }}
@@ -580,6 +614,8 @@ func ({{.ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else i
     return err
   }
         {{- end }}
+
+        {{/* WIP yy: readonly is in property validator */}}
         {{template "propertyvalidator" . }}
 
   return nil

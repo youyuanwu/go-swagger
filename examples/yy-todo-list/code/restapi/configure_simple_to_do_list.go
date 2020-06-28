@@ -52,11 +52,10 @@ func configureAPI(api *operations.SimpleToDoListAPI) http.Handler {
 	//
 	// Example:
 	// api.APIAuthorizer = security.Authorized()
-	if api.TodosAddOneHandler == nil {
-		api.TodosAddOneHandler = todos.AddOneHandlerFunc(func(params todos.AddOneParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation todos.AddOne has not yet been implemented")
-		})
-	}
+	api.TodosAddOneHandler = todos.AddOneHandlerFunc(func(params todos.AddOneParams, principal interface{}) middleware.Responder {
+		return todos.NewAddOneCreated().WithPayload(params.Body)
+	})
+
 	if api.TodosDestroyOneHandler == nil {
 		api.TodosDestroyOneHandler = todos.DestroyOneHandlerFunc(func(params todos.DestroyOneParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation todos.DestroyOne has not yet been implemented")

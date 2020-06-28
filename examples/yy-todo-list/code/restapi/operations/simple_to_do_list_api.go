@@ -91,11 +91,11 @@ type SimpleToDoListAPI struct {
 	BearerAuthenticator func(string, security.ScopedTokenAuthentication) runtime.Authenticator
 
 	// JSONConsumer registers a consumer for the following mime types:
-	//   - application/io.swagger.examples.todo-list.v1+json
+	//   - application/json
 	JSONConsumer runtime.Consumer
 
 	// JSONProducer registers a producer for the following mime types:
-	//   - application/io.swagger.examples.todo-list.v1+json
+	//   - application/json
 	JSONProducer runtime.Producer
 
 	// KeyAuth registers a function that takes a token and returns a principal
@@ -233,8 +233,8 @@ func (o *SimpleToDoListAPI) ConsumersFor(mediaTypes []string) map[string]runtime
 	result := make(map[string]runtime.Consumer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
-		case "application/io.swagger.examples.todo-list.v1+json":
-			result["application/io.swagger.examples.todo-list.v1+json"] = o.JSONConsumer
+		case "application/json":
+			result["application/json"] = o.JSONConsumer
 		}
 
 		if c, ok := o.customConsumers[mt]; ok {
@@ -250,8 +250,8 @@ func (o *SimpleToDoListAPI) ProducersFor(mediaTypes []string) map[string]runtime
 	result := make(map[string]runtime.Producer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
-		case "application/io.swagger.examples.todo-list.v1+json":
-			result["application/io.swagger.examples.todo-list.v1+json"] = o.JSONProducer
+		case "application/json":
+			result["application/json"] = o.JSONProducer
 		}
 
 		if p, ok := o.customProducers[mt]; ok {

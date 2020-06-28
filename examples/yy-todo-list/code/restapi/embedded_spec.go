@@ -19,10 +19,10 @@ var (
 func init() {
 	SwaggerJSON = json.RawMessage([]byte(`{
   "consumes": [
-    "application/io.swagger.examples.todo-list.v1+json"
+    "application/json"
   ],
   "produces": [
-    "application/io.swagger.examples.todo-list.v1+json"
+    "application/json"
   ],
   "schemes": [
     "http",
@@ -229,6 +229,31 @@ func init() {
           "format": "int64",
           "maximum": 10,
           "readOnly": true
+        },
+        "slice": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Child": {
+                "type": "object",
+                "properties": {
+                  "Age": {
+                    "type": "integer"
+                  },
+                  "ChildNameReadOnly": {
+                    "type": "string",
+                    "readOnly": true
+                  }
+                }
+              },
+              "nameReadOnly": {
+                "type": "string",
+                "readOnly": true
+              }
+            }
+          },
+          "readOnly": true
         }
       }
     }
@@ -251,10 +276,10 @@ func init() {
 }`))
 	FlatSwaggerJSON = json.RawMessage([]byte(`{
   "consumes": [
-    "application/io.swagger.examples.todo-list.v1+json"
+    "application/json"
   ],
   "produces": [
-    "application/io.swagger.examples.todo-list.v1+json"
+    "application/json"
   ],
   "schemes": [
     "http",
@@ -421,6 +446,39 @@ func init() {
     }
   },
   "definitions": {
+    "ItemSliceItems0": {
+      "type": "object",
+      "properties": {
+        "Child": {
+          "type": "object",
+          "properties": {
+            "Age": {
+              "type": "integer"
+            },
+            "ChildNameReadOnly": {
+              "type": "string",
+              "readOnly": true
+            }
+          }
+        },
+        "nameReadOnly": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "ItemSliceItems0Child": {
+      "type": "object",
+      "properties": {
+        "Age": {
+          "type": "integer"
+        },
+        "ChildNameReadOnly": {
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
     "error": {
       "type": "object",
       "required": [
@@ -461,6 +519,13 @@ func init() {
           "type": "integer",
           "format": "int64",
           "maximum": 10,
+          "readOnly": true
+        },
+        "slice": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ItemSliceItems0"
+          },
           "readOnly": true
         }
       }
