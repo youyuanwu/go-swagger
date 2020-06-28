@@ -5,7 +5,12 @@
   }
   {{ end }}
   {{- if .ReadOnly }}
-  // WIP yy: move to pkg, elevate to ptr
+    {{/* Note(yy): ReadOnly field we require that it is set to the zero value of that type. 
+    If user sends zero value in payload, the validation will pass. */}}
+  // WIP yy: Implement in validate pkg and replace temp code with this commented code
+  // if err := validate.ReadOnly(ctx, {{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{ if not (or .IsAnonymous .IsNullable) }}{{ .GoType }}({{ end }}{{.ValueExpression }}{{ if not (or .IsAnonymous .IsNullable) }}){{ end }}); err != nil {
+  //    return err
+  // }
   // READONLY HERE primitive 
 	if err := func(ctx context.Context, path string, in string, data interface{}) error {
 		if v := ctx.Value("operation-type"); v != nil {
@@ -74,7 +79,11 @@
     }
   {{ end }}
   {{- if .ReadOnly }}
-  // READONLY HERE This shows up. WIP: use same validation function as primitivefieldvalidator
+  // READONLY For slice. 
+  // WIP yy: Implement in validate pkg and replace temp code with this commented code
+  // if err := validate.ReadOnly(ctx, {{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{ .ValueExpression }}); err != nil {
+  //    return err
+  // }
   {{- end }}
   {{ if or .MinItems .MaxItems }}
     {{ .IndexVar }}{{ pascalize .Name }}Size := int64(len({{.ValueExpression }}))
@@ -267,6 +276,7 @@
 {{ end }}
 
 {{define "objectvalidator" }}
+  {{/*
   // DEBUG
   // .Name: {{ .Name }}
   // .IsAliased: {{ .IsAliased }}
@@ -277,6 +287,7 @@
   // .IsBaseType: {{ .IsBaseType }}
   // .ValueExpression: {{ .ValueExpression }}
   // .ReceiverName: {{ .ReceiverName }}
+  */}}
   {{- if not .IsAnonymous }}
     {{- if and .Required (or .IsNullable .IsBaseType) }}
       if err := validate.Required({{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{.ValueExpression }}); err != nil {

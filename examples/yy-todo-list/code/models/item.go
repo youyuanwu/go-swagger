@@ -29,7 +29,7 @@ type Item struct {
 	// Required: true
 	// Min Length: 1
 	// Pattern: xyx-*-xyz
-	Description *string `json:"description"`
+	Description string `json:"description"`
 
 	// description2
 	// Enum: [a b]
@@ -74,15 +74,15 @@ func (m *Item) Validate(ctx context.Context, formats strfmt.Registry) error {
 
 func (m *Item) validateDescription(ctx context.Context, formats strfmt.Registry) error {
 
-	if err := validate.Required("description", "body", m.Description); err != nil {
+	if err := validate.RequiredString("description", "body", string(m.Description)); err != nil {
 		return err
 	}
 
-	if err := validate.MinLength("description", "body", string(*m.Description), 1); err != nil {
+	if err := validate.MinLength("description", "body", string(m.Description), 1); err != nil {
 		return err
 	}
 
-	if err := validate.Pattern("description", "body", string(*m.Description), `xyx-*-xyz`); err != nil {
+	if err := validate.Pattern("description", "body", string(m.Description), `xyx-*-xyz`); err != nil {
 		return err
 	}
 
@@ -138,7 +138,10 @@ func (m *Item) validateID(ctx context.Context, formats strfmt.Registry) error {
 		return nil
 	}
 
-	// WIP yy: move to pkg, elevate to ptr
+	// WIP yy: Implement in validate pkg and replace temp code with this commented code
+	// if err := validate.ReadOnly(ctx, "id", "body", int64(m.ID)); err != nil {
+	//    return err
+	// }
 	// READONLY HERE primitive
 	if err := func(ctx context.Context, path string, in string, data interface{}) error {
 		if v := ctx.Value("operation-type"); v != nil {
@@ -172,23 +175,17 @@ func (m *Item) validateSlice(ctx context.Context, formats strfmt.Registry) error
 		return nil
 	}
 
-	// READONLY HERE This shows up. WIP: use same validation function as primitivefieldvalidator
+	// READONLY For slice.
+	// WIP yy: Implement in validate pkg and replace temp code with this commented code
+	// if err := validate.ReadOnly(ctx, "slice", "body", m.Slice); err != nil {
+	//    return err
+	// }
 
 	for i := 0; i < len(m.Slice); i++ {
 		if swag.IsZero(m.Slice[i]) { // not required
 			continue
 		}
 
-		// DEBUG
-		// .Name: slice
-		// .IsAliased: false
-		// .IsAnonymous: false
-		// .IsNullable: true
-		// .Required: false
-		// .ReadOnly: false
-		// .IsBaseType: false
-		// .ValueExpression: m.Slice[i]
-		// .ReceiverName: m
 		if m.Slice[i] != nil {
 			if err := m.Slice[i].Validate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
@@ -260,16 +257,6 @@ func (m *ItemSliceItems0) validateSliceItemContent(ctx context.Context, formats 
 		return nil
 	}
 
-	// DEBUG
-	// .Name: sliceItemContent
-	// .IsAliased: false
-	// .IsAnonymous: false
-	// .IsNullable: true
-	// .Required: false
-	// .ReadOnly: false
-	// .IsBaseType: false
-	// .ValueExpression: m.SliceItemContent
-	// .ReceiverName: m
 	if m.SliceItemContent != nil {
 		if err := m.SliceItemContent.Validate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
@@ -288,7 +275,10 @@ func (m *ItemSliceItems0) validateSliceItemNameReadOnly(ctx context.Context, for
 		return err
 	}
 
-	// WIP yy: move to pkg, elevate to ptr
+	// WIP yy: Implement in validate pkg and replace temp code with this commented code
+	// if err := validate.ReadOnly(ctx, "sliceItemNameReadOnly", "body", string(m.SliceItemNameReadOnly)); err != nil {
+	//    return err
+	// }
 	// READONLY HERE primitive
 	if err := func(ctx context.Context, path string, in string, data interface{}) error {
 		if v := ctx.Value("operation-type"); v != nil {
@@ -364,7 +354,10 @@ func (m *ItemSliceItems0SliceItemContent) validateContentNameReadOnly(ctx contex
 		return nil
 	}
 
-	// WIP yy: move to pkg, elevate to ptr
+	// WIP yy: Implement in validate pkg and replace temp code with this commented code
+	// if err := validate.ReadOnly(ctx, "sliceItemContent"+"."+"ContentNameReadOnly", "body", string(m.ContentNameReadOnly)); err != nil {
+	//    return err
+	// }
 	// READONLY HERE primitive
 	if err := func(ctx context.Context, path string, in string, data interface{}) error {
 		if v := ctx.Value("operation-type"); v != nil {

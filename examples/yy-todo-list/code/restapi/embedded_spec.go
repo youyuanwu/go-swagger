@@ -215,7 +215,8 @@ func init() {
         "description": {
           "type": "string",
           "minLength": 1,
-          "pattern": "xyx-*-xyz"
+          "pattern": "xyx-*-xyz",
+          "x-nullable": false
         },
         "description2": {
           "type": "string",
@@ -512,7 +513,8 @@ func init() {
         "description": {
           "type": "string",
           "minLength": 1,
-          "pattern": "xyx-*-xyz"
+          "pattern": "xyx-*-xyz",
+          "x-nullable": false
         },
         "description2": {
           "type": "string",

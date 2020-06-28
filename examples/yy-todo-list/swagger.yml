@@ -137,6 +137,7 @@ definitions:
         type: string
         minLength: 1
         pattern: "xyx-*-xyz"
+        x-nullable: false
       description2:
         type: string
         enum:
