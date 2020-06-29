@@ -7,7 +7,9 @@
         In the definition of the base type itself, this means that the unexported struct holding
         the definition of the base type has a Validate() func.
     */}}
-        runtime.Validatable
+        // WIP yy: change the validatable interface in validate pkg
+        // runtime.Validatable
+        Validate(context.Context, strfmt.Registry) error
   {{- end }}
   {{ range .AllOf }}
     {{- if .IsAnonymous }}
