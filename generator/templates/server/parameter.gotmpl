@@ -103,13 +103,13 @@
     {{- if and (not .IsArray) (not .IsMap) .Schema.HasValidations }}
   // validate inline body
   {{ .ReceiverName }}.{{ pascalize .Name }} = {{ if and (not .Schema.IsBaseType) .IsNullable }}&{{ end }}body
-  if err := {{ .ReceiverName }}.validate{{ pascalize .ID }}Body(route.Formats); err != nil {
+  if err := {{ .ReceiverName }}.validate{{ pascalize .ID }}Body(ctx, route.Formats); err != nil {
     res = append(res, err)
   }
     {{- else if and (or .IsArray .IsMap) .Schema.HasValidations }}
   // validate inline body {{ if .IsArray }}array{{ else }}map{{ end }}
   {{ .ReceiverName }}.{{ pascalize .Name }} = {{ if and (not .Schema.IsBaseType) .IsNullable }}&{{ end }}body
-  if err := {{ .ReceiverName }}.validate{{ pascalize .ID }}Body(route.Formats); err != nil {
+  if err := {{ .ReceiverName }}.validate{{ pascalize .ID }}Body(ctx, route.Formats); err != nil {
     res = append(res, err)
   }
     {{- else  }}

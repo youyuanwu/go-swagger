@@ -454,7 +454,6 @@ func ({{ .ReceiverName }} *{{ if .IsExported }}{{ pascalize .Name }}{{ else }}{{
     {{- end }}
   {{ end }}
 // Validate validates this {{ humanize .Name }}
-// TODO yy: remove general case
 func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalProperties }}*{{ end }}{{ if .Discriminates }}{{ camelize .Name }}{{ else if .IsExported }}{{ pascalize .Name }}{{ else }}{{ .Name }}{{ end }}) Validate(ctx context.Context, formats strfmt.Registry) error {
   var res []error
 

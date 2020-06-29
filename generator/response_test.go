@@ -522,10 +522,10 @@ func TestGenResponse_15362_WithExpand(t *testing.T) {
 				// expected code lines
 				`type GetNestedRequiredOKBodyItems0 struct {`,
 				"	Pkcs *string `json:\"pkcs\"`",
-				`func (o *GetNestedRequiredOKBodyItems0) Validate(formats strfmt.Registry) error {`,
-				`	if err := o.validatePkcs(formats); err != nil {`,
+				`func (o *GetNestedRequiredOKBodyItems0) Validate(ctx context.Context, formats strfmt.Registry) error {`,
+				`	if err := o.validatePkcs(ctx, formats); err != nil {`,
 				`		return errors.CompositeValidationError(res...`,
-				`func (o *GetNestedRequiredOKBodyItems0) validatePkcs(formats strfmt.Registry) error {`,
+				`func (o *GetNestedRequiredOKBodyItems0) validatePkcs(ctx context.Context, formats strfmt.Registry) error {`,
 				`	if err := validate.Required("pkcs", "body", o.Pkcs); err != nil {`,
 			},
 		},
