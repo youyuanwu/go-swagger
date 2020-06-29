@@ -3,8 +3,9 @@
 
 {{ define "bodyvalidator" }}
   {{- if .HasModelBodyParams }}
-  // WIP yy: declare ctx key type {{/*ctx is used for passing the operation type to validate readOnly properties*/}}
-  // WIP yy: move to open-api validate pkg and declare methods to create and extract ctx
+    {{/*ctx is used for passing the operation type to validate readOnly properties*/}}
+  // WIP yy: Implement context creation func in validate pkg and uncomment the next line
+  // ctx := validate.WithOperationRequest(context.Background())
   ctx := context.WithValue(context.Background(), "operation-type", "Request")
   // validate body object{{/* delegate validation to model object */}}
   if err := body.Validate(ctx, route.Formats); err != nil {
@@ -36,7 +37,8 @@
         {{- end }}
     }
       {{- end }}
-    // WIP yy: declare context key type
+    // WIP yy: Implement context creation func in validate pkg and uncomment the next line
+    // ctx := validate.WithOperationRequest(context.Background())
     ctx := context.WithValue(context.Background(), "operation-type", "Request")
     if err := body[{{ .IndexVar }}].Validate(ctx, route.Formats); err != nil {
       res = append(res, err)
