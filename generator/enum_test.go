@@ -63,7 +63,7 @@ func TestEnum_ComposedThing(t *testing.T) {
 				ff, err := opts.LanguageOpts.FormatContent("composed_thing.go", buf.Bytes())
 				if assert.NoError(t, err) {
 					res := string(ff)
-					assertInCode(t, "m.StringThing.Validate(formats)", res)
+					assertInCode(t, "m.StringThing.Validate(ctx, formats)", res)
 					assertInCode(t, "var composedThingTypeNamePropEnum []interface{}", res)
 					assertInCode(t, "m.validateNameEnum(\"name\", \"body\", *m.Name)", res)
 					assertInCode(t, k+") validateNameEnum(path, location string, value string)", res)
@@ -400,11 +400,11 @@ func TestEnum_NewPrototype(t *testing.T) {
 					assertInCode(t, "Role *string `json:\"role\"`", res)
 					assertInCode(t, "var newPrototypeTypeRolePropEnum []interface{}", res)
 					assertInCode(t, "var newPrototypeDelegateTypeKindPropEnum []interface{}", res)
-					assertInCode(t, "m.validateDelegate(formats)", res)
-					assertInCode(t, "m.validateRole(formats)", res)
-					assertInCode(t, "m.validateActivatingUser(formats)", res)
-					assertInCode(t, "m.Delegate.Validate(formats)", res)
-					assertInCode(t, "m.ActivatingUser.Validate(formats)", res)
+					assertInCode(t, "m.validateDelegate(ctx, formats)", res)
+					assertInCode(t, "m.validateRole(ctx, formats)", res)
+					assertInCode(t, "m.validateActivatingUser(ctx, formats)", res)
+					assertInCode(t, "m.Delegate.Validate(ctx, formats)", res)
+					assertInCode(t, "m.ActivatingUser.Validate(ctx, formats)", res)
 				}
 			}
 		}
