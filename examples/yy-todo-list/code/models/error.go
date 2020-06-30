@@ -28,7 +28,6 @@ type Error struct {
 }
 
 // Validate validates this error
-// TODO yy: remove general case
 func (m *Error) Validate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 

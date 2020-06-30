@@ -53,8 +53,9 @@ func (o *AddOneParams) BindRequest(r *http.Request, route *middleware.MatchedRou
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
-			// WIP yy: declare ctx key type
-			// WIP yy: move to open-api validate pkg and declare methods to create and extract ctx
+
+			// WIP yy: Implement context creation func in validate pkg and uncomment the next line
+			// ctx := validate.WithOperationRequest(context.Background())
 			ctx := context.WithValue(context.Background(), "operation-type", "Request")
 			// validate body object
 			if err := body.Validate(ctx, route.Formats); err != nil {

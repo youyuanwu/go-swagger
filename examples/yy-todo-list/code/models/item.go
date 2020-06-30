@@ -46,7 +46,6 @@ type Item struct {
 }
 
 // Validate validates this item
-// TODO yy: remove general case
 func (m *Item) Validate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
@@ -142,7 +141,7 @@ func (m *Item) validateID(ctx context.Context, formats strfmt.Registry) error {
 	// if err := validate.ReadOnly(ctx, "id", "body", int64(m.ID)); err != nil {
 	//    return err
 	// }
-	// READONLY HERE primitive
+	//----- READONLY for primitive temporary code -----
 	if err := func(ctx context.Context, path string, in string, data interface{}) error {
 		if v := ctx.Value("operation-type"); v != nil {
 			if s, ok := v.(string); ok {
@@ -161,6 +160,7 @@ func (m *Item) validateID(ctx context.Context, formats strfmt.Registry) error {
 	}(ctx, "id", "body", m.ID); err != nil {
 		return err
 	}
+	//------ temporary code end -------
 
 	if err := validate.MaximumInt("id", "body", int64(m.ID), 10, false); err != nil {
 		return err
@@ -233,7 +233,6 @@ type ItemSliceItems0 struct {
 }
 
 // Validate validates this item slice items0
-// TODO yy: remove general case
 func (m *ItemSliceItems0) Validate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
@@ -279,7 +278,7 @@ func (m *ItemSliceItems0) validateSliceItemNameReadOnly(ctx context.Context, for
 	// if err := validate.ReadOnly(ctx, "sliceItemNameReadOnly", "body", string(m.SliceItemNameReadOnly)); err != nil {
 	//    return err
 	// }
-	// READONLY HERE primitive
+	//----- READONLY for primitive temporary code -----
 	if err := func(ctx context.Context, path string, in string, data interface{}) error {
 		if v := ctx.Value("operation-type"); v != nil {
 			if s, ok := v.(string); ok {
@@ -298,6 +297,7 @@ func (m *ItemSliceItems0) validateSliceItemNameReadOnly(ctx context.Context, for
 	}(ctx, "sliceItemNameReadOnly", "body", m.SliceItemNameReadOnly); err != nil {
 		return err
 	}
+	//------ temporary code end -------
 
 	return nil
 }
@@ -334,7 +334,6 @@ type ItemSliceItems0SliceItemContent struct {
 }
 
 // Validate validates this item slice items0 slice item content
-// TODO yy: remove general case
 func (m *ItemSliceItems0SliceItemContent) Validate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
@@ -358,7 +357,7 @@ func (m *ItemSliceItems0SliceItemContent) validateContentNameReadOnly(ctx contex
 	// if err := validate.ReadOnly(ctx, "sliceItemContent"+"."+"ContentNameReadOnly", "body", string(m.ContentNameReadOnly)); err != nil {
 	//    return err
 	// }
-	// READONLY HERE primitive
+	//----- READONLY for primitive temporary code -----
 	if err := func(ctx context.Context, path string, in string, data interface{}) error {
 		if v := ctx.Value("operation-type"); v != nil {
 			if s, ok := v.(string); ok {
@@ -377,6 +376,7 @@ func (m *ItemSliceItems0SliceItemContent) validateContentNameReadOnly(ctx contex
 	}(ctx, "sliceItemContent"+"."+"ContentNameReadOnly", "body", m.ContentNameReadOnly); err != nil {
 		return err
 	}
+	//------ temporary code end -------
 
 	return nil
 }

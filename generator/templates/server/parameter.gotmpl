@@ -559,6 +559,8 @@ func ({{ .ReceiverName }} *{{ $className }}Params) bind{{ pascalize .ID }}(rawDa
       {{else}}{{ .ValueExpression }} = {{ if .IsNullable }}&{{ end }}raw
       {{ end }}
       {{if .HasValidations }}
+  {{/* Param validation outside body does not have ReadOnly properties, so leave as context.TODO().
+    Param validation also use ctx because we want generated validation code to have an uniform signature*/}}
   ctx := context.TODO() // ctx here is a placeholder for future use
   if err := {{ .ReceiverName }}.validate{{ pascalize .ID }}(ctx, formats); err != nil {
     return err

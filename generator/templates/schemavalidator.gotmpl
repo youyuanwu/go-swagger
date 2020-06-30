@@ -11,7 +11,7 @@
   // if err := validate.ReadOnly(ctx, {{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{ if not (or .IsAnonymous .IsNullable) }}{{ .GoType }}({{ end }}{{.ValueExpression }}{{ if not (or .IsAnonymous .IsNullable) }}){{ end }}); err != nil {
   //    return err
   // }
-  // READONLY HERE primitive 
+  //----- READONLY for primitive temporary code -----
 	if err := func(ctx context.Context, path string, in string, data interface{}) error {
 		if v := ctx.Value("operation-type"); v != nil {
 			if s, ok := v.(string); ok {
@@ -30,6 +30,7 @@
 	}(ctx, {{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{ .ValueExpression }}); err != nil {
 		return err
 	}
+  //------ temporary code end -------
   {{- end }}
   {{ if .MinLength }}
   if err := validate.MinLength({{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, string({{ if .IsNullable }}*{{ end }}{{.ValueExpression }}), {{.MinLength }}); err != nil {
@@ -192,7 +193,8 @@
   }
           {{- end }}
           {{- if .ReadOnly }}
-  // READONLY HERE 6 WIP: test this, not showing up
+  {{/* WIP: decide what to do here*/}}
+  // WIP yy: Implement ReadOnly for custom format 
           {{- end }}
           {{- if and (not .IsStream) (not .IsBase64) }}{{/* TODO: IsStream and CustomFormattershould be mutually exclusive in type resolver */}}
             {{ template "validationCustomformat" . }}
@@ -343,7 +345,8 @@
   }
     {{- end }}
     {{- if .ReadOnly }}
-  // READONLY HERE custom fmt WIP: not tested
+    {{/*WIP yy: decide what to do here*/}}
+  // WIP: READONLY for custom formatter. 
     {{- end }}
     {{- if and (not .IsStream) (not .IsBase64) }}
       {{ template "validationCustomformat" . }}
@@ -367,7 +370,8 @@
   }
     {{- end }}
     {{- if .ReadOnly }}
-  // READONLY HERE WIP: not tested custom fmt
+      {{/*WIP yy: decide what to do here*/}}
+  // WIP: READONLY for custom formatter. 
     {{- end }}
     {{- if and (not .IsStream) (not .IsBase64) }}
       {{ template "validationCustomformat" . }}
@@ -626,7 +630,7 @@ func ({{.ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else i
   }
         {{- end }}
 
-        {{/* WIP yy: readonly is in property validator */}}
+        {{/* WIP yy: Do we need ReadOnly Validation here for Tuple and Map?  */}}
         {{template "propertyvalidator" . }}
 
   return nil
