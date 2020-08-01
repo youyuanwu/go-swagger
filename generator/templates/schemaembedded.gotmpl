@@ -3,9 +3,10 @@ type {{ pascalize .Name }} struct {
   {{ if .ElemType.IsNullable }}*{{ end }}{{ .ElemType.GoType }}
 }
 
-func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject }}*{{ end }}{{ if .Discriminates }}{{ camelize .Name }}{{ else if .IsExported }}{{ pascalize .Name }}{{ else }}{{ .Name }}{{ end }}) Validate(formats strfmt.Registry) error {
+func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject }}*{{ end }}{{ if .Discriminates }}{{ camelize .Name }}{{ else if .IsExported }}{{ pascalize .Name }}{{ else }}{{ .Name }}{{ end }}) Validate(ctx context.Context, formats strfmt.Registry) error {
   var f interface{} = {{ .ReceiverName }}.{{ dropPackage .ElemType.GoType }}
   if v, ok := f.(runtime.Validatable) ; ok {
+    // WIP yy: TODO: this interface needs to be changed for consistency?
     return v.Validate(formats)
   }
   return nil
