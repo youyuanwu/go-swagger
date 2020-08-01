@@ -44,7 +44,7 @@ func TestGenerateModel_DiscriminatorSlices(t *testing.T) {
 	assertInCode(t, "type Kennel struct {", res)
 	assertInCode(t, "ID int64 `json:\"id,omitempty\"`", res)
 	assertInCode(t, "Pets []Pet `json:\"pets\"`", res)
-	assertInCode(t, "if err := m.petsField[i].Validate(formats); err != nil {", res)
+	assertInCode(t, "if err := m.petsField[i].Validate(ctx, formats); err != nil {", res)
 	assertInCode(t, "m.validatePet", res)
 }
 
@@ -73,16 +73,16 @@ func TestGenerateModel_Discriminators(t *testing.T) {
 
 		res := string(b)
 		assertNotInCode(t, "m.Pet.Validate", res)
-		assertInCode(t, "if err := m.validateName(formats); err != nil {", res)
+		assertInCode(t, "if err := m.validateName(ctx, formats); err != nil {", res)
 
 		if k == "Dog" {
-			assertInCode(t, "func (m *Dog) validatePackSize(formats strfmt.Registry) error {", res)
-			assertInCode(t, "if err := m.validatePackSize(formats); err != nil {", res)
+			assertInCode(t, "func (m *Dog) validatePackSize(ctx context.Context, formats strfmt.Registry) error {", res)
+			assertInCode(t, "if err := m.validatePackSize(ctx, formats); err != nil {", res)
 			assertInCode(t, "PackSize: m.PackSize,", res)
 			assertInCode(t, "validate.Required(\"packSize\", \"body\", m.PackSize)", res)
 		} else {
-			assertInCode(t, "func (m *Cat) validateHuntingSkill(formats strfmt.Registry) error {", res)
-			assertInCode(t, "if err := m.validateHuntingSkill(formats); err != nil {", res)
+			assertInCode(t, "func (m *Cat) validateHuntingSkill(ctx context.Context, formats strfmt.Registry) error {", res)
+			assertInCode(t, "if err := m.validateHuntingSkill(ctx, formats); err != nil {", res)
 			assertInCode(t, "if err := m.validateHuntingSkillEnum(\"huntingSkill\", \"body\", *m.HuntingSkill); err != nil {", res)
 			assertInCode(t, "HuntingSkill: m.HuntingSkill", res)
 		}
@@ -163,7 +163,7 @@ func TestGenerateModel_UsesDiscriminator(t *testing.T) {
 	assertInCode(t, "type WithPet struct {", res)
 	assertInCode(t, "ID int64 `json:\"id,omitempty\"`", res)
 	assertInCode(t, "petField Pet", res)
-	assertInCode(t, "if err := m.Pet().Validate(formats); err != nil {", res)
+	assertInCode(t, "if err := m.Pet().Validate(ctx, formats); err != nil {", res)
 	assertInCode(t, "m.validatePet", res)
 }
 
@@ -364,7 +364,7 @@ func TestGenerateModel_Issue541(t *testing.T) {
 
 	res := string(b)
 	assertInCode(t, "Cat", res)
-	assertInCode(t, "m.Cat.Validate(formats)", res)
+	assertInCode(t, "m.Cat.Validate(ctx, formats)", res)
 }
 
 func TestGenerateModel_Issue436(t *testing.T) {
@@ -388,7 +388,7 @@ func TestGenerateModel_Issue436(t *testing.T) {
 
 	res := string(b)
 	assertInCode(t, "Links", res)
-	assertInCode(t, "m.Links.Validate(formats)", res)
+	assertInCode(t, "m.Links.Validate(ctx, formats)", res)
 	assertInCode(t, "Created *strfmt.DateTime `json:\"created\"`", res)
 	assertInCode(t, "ImageID *string `json:\"imageId\"`", res)
 	assertInCode(t, "Size *int64 `json:\"size\"`", res)
@@ -415,7 +415,7 @@ func TestGenerateModel_Issue740(t *testing.T) {
 
 	res := string(b)
 	assertInCode(t, "Foo", res)
-	assertInCode(t, "m.Foo.Validate(formats)", res)
+	assertInCode(t, "m.Foo.Validate(ctx, formats)", res)
 }
 
 func TestGenerateModel_Issue743(t *testing.T) {
@@ -440,8 +440,8 @@ func TestGenerateModel_Issue743(t *testing.T) {
 	res := string(b)
 	assertInCode(t, "Foo", res)
 	assertInCode(t, "Bar", res)
-	assertInCode(t, "m.Foo.Validate(formats)", res)
-	assertInCode(t, "m.Bar.Validate(formats)", res)
+	assertInCode(t, "m.Foo.Validate(ctx, formats)", res)
+	assertInCode(t, "m.Bar.Validate(ctx, formats)", res)
 	assertInCode(t, "swag.WriteJSON(m.Foo)", res)
 	assertInCode(t, "swag.WriteJSON(m.Bar)", res)
 	assertInCode(t, "swag.ReadJSON(raw, &aO0)", res)

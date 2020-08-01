@@ -266,7 +266,7 @@ func TestGenerateModel_Primitives(t *testing.T) {
 			tt.assertRender(&val, "type TheType "+exp+"\n  \n")
 			continue
 		}
-		tt.assertRender(&val, "type TheType "+exp+"\n  \n// Validate validates this the type\nfunc (o theType) Validate(formats strfmt.Registry) error {\n  return nil\n}\n")
+		tt.assertRender(&val, "type TheType "+exp+"\n  \n// Validate validates this the type\nfunc (o theType) Validate(ctx context.Context, formats strfmt.Registry) error {\n  return nil\n}\n")
 	}
 }
 
@@ -1595,7 +1595,7 @@ func TestGenModel_Issue196(t *testing.T) {
 				ct, err := opts.LanguageOpts.FormatContent("primitive_event.go", buf.Bytes())
 				if assert.NoError(t, err) {
 					res := string(ct)
-					assertInCode(t, "Event) Validate(formats strfmt.Registry) error", res)
+					assertInCode(t, "Event) Validate(ctx context.Context, formats strfmt.Registry) error", res)
 				}
 			}
 		}
@@ -1616,9 +1616,9 @@ func TestGenModel_Issue222(t *testing.T) {
 				ct, err := opts.LanguageOpts.FormatContent("price.go", buf.Bytes())
 				if assert.NoError(t, err) {
 					res := string(ct)
-					assertInCode(t, "Price) Validate(formats strfmt.Registry) error", res)
+					assertInCode(t, "Price) Validate(ctx context.Context, formats strfmt.Registry) error", res)
 					assertInCode(t, "Currency Currency `json:\"currency,omitempty\"`", res)
-					assertInCode(t, "m.Currency.Validate(formats); err != nil", res)
+					assertInCode(t, "m.Currency.Validate(ctx, formats); err != nil", res)
 				}
 			}
 		}
@@ -1748,7 +1748,7 @@ func TestGenModel_Issue340(t *testing.T) {
 					res := string(ct)
 
 					b1 := assertInCode(t, "type "+swag.ToGoName(k)+" io.ReadCloser", res)
-					b2 := assertNotInCode(t, "func (m ImageTar) Validate(formats strfmt.Registry) error", res)
+					b2 := assertNotInCode(t, "func (m ImageTar) Validate(ctx context.Context, formats strfmt.Registry) error", res)
 					if !(b1 && b2) {
 						fmt.Println(res)
 					}
@@ -1888,7 +1888,7 @@ func TestGenModel_Issue453(t *testing.T) {
 				ct, err := opts.LanguageOpts.FormatContent("out_obj.go", buf.Bytes())
 				if assert.NoError(t, err) {
 					res := string(ct)
-					assertInCode(t, `func (m *OutObj) validateFld3(formats strfmt.Registry)`, res)
+					assertInCode(t, `func (m *OutObj) validateFld3(ctx context.Context, formats strfmt.Registry)`, res)
 				} else {
 					fmt.Println(buf.String())
 				}
@@ -2215,7 +2215,7 @@ func TestGenModel_Issue1198(t *testing.T) {
 					//log.Println("1198")
 					//log.Println(res)
 					// Just verify that the validation call is generated with proper format
-					assertInCode(t, `if err := m.validateDate(formats); err != nil {`, res)
+					assertInCode(t, `if err := m.validateDate(ctx, formats); err != nil {`, res)
 				} else {
 					fmt.Println(buf.String())
 				}
@@ -2336,8 +2336,8 @@ func TestGenModel_Issue866(t *testing.T) {
 							res := string(ct)
 							assertInCode(t, `if err := validate.Required(`, res)
 							assertInCode(t, `if err := validate.MaxLength(`, res)
-							assertInCode(t, `if err := m.validateAccessToken(formats); err != nil {`, res)
-							assertInCode(t, `if err := m.validateAccountID(formats); err != nil {`, res)
+							assertInCode(t, `if err := m.validateAccessToken(ctx, formats); err != nil {`, res)
+							assertInCode(t, `if err := m.validateAccountID(ctx, formats); err != nil {`, res)
 						} else {
 							fmt.Println(buf.String())
 						}
