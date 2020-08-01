@@ -183,7 +183,7 @@ func shallowValidationLookup(sch GenSchema) bool {
 	if sch.IsStream || sch.IsInterface { // these types have no validation - aliased types on those do not implement the Validatable interface
 		return false
 	}
-	if sch.Required || hasFormatValidation(sch.resolvedType) {
+	if sch.Required || sch.ReadOnly || hasFormatValidation(sch.resolvedType) {
 		return true
 	}
 	if sch.MaxLength != nil || sch.MinLength != nil || sch.Pattern != "" || sch.MultipleOf != nil || sch.Minimum != nil || sch.Maximum != nil || len(sch.Enum) > 0 || len(sch.ItemsEnum) > 0 {
@@ -197,7 +197,7 @@ func shallowValidationLookup(sch GenSchema) bool {
 	for _, p := range sch.Properties {
 		// Using a base type within another structure triggers validation of the base type.
 		// The discriminator property in the base type definition itself does not.
-		if (p.HasValidations || p.Required) && !(sch.IsBaseType && p.Name == sch.DiscriminatorField) || (p.IsAliased || p.IsComplexObject) && !(p.IsInterface || p.IsStream) {
+		if (p.HasValidations || p.Required || p.ReadOnly) && !(sch.IsBaseType && p.Name == sch.DiscriminatorField) || (p.IsAliased || p.IsComplexObject) && !(p.IsInterface || p.IsStream) {
 			return true
 		}
 	}
@@ -645,7 +645,7 @@ func hasValidations(model *spec.Schema, isRequired bool) (hasValidation bool) {
 		}
 	}
 
-	hasValidation = hasNumberValidation || hasStringValidation || hasSliceValidations(model) || hasEnum || simpleObject || hasAllOfValidation || isRequired
+	hasValidation = hasNumberValidation || hasStringValidation || hasSliceValidations(model) || hasEnum || simpleObject || hasAllOfValidation || isRequired || model.ReadOnly
 
 	return
 }

@@ -4,6 +4,34 @@
     return err
   }
   {{ end }}
+  {{- if .ReadOnly }}
+    {{/* Note(yy): ReadOnly field we require that it is set to the zero value of that type. 
+    If user sends zero value in payload, the validation will pass. */}}
+  // WIP yy: Implement in validate pkg and replace temp code with this commented code
+  // if err := validate.ReadOnly(ctx, {{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{ if not (or .IsAnonymous .IsNullable) }}{{ .GoType }}({{ end }}{{.ValueExpression }}{{ if not (or .IsAnonymous .IsNullable) }}){{ end }}); err != nil {
+  //    return err
+  // }
+  //----- READONLY for primitive temporary code -----
+	if err := func(ctx context.Context, path string, in string, data interface{}) error {
+		if v := ctx.Value("operation-type"); v != nil {
+			if s, ok := v.(string); ok {
+				if s != "Request" {
+					// pass not request
+					return nil
+				}
+				if !swag.IsZero(data) {
+					return errors.New(400, fmt.Sprintf("ReadOnly field %v found in %v", in, path))
+				}
+			}
+			return nil
+		}
+		// operation type not set so skip validating
+		return nil
+	}(ctx, {{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{ .ValueExpression }}); err != nil {
+		return err
+	}
+  //------ temporary code end -------
+  {{- end }}
   {{ if .MinLength }}
   if err := validate.MinLength({{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, string({{ if .IsNullable }}*{{ end }}{{.ValueExpression }}), {{.MinLength }}); err != nil {
     return err
@@ -51,6 +79,13 @@
       return err
     }
   {{ end }}
+  {{- if .ReadOnly }}
+  // READONLY For slice. 
+  // WIP yy: Implement in validate pkg and replace temp code with this commented code
+  // if err := validate.ReadOnly(ctx, {{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{ .ValueExpression }}); err != nil {
+  //    return err
+  // }
+  {{- end }}
   {{ if or .MinItems .MaxItems }}
     {{ .IndexVar }}{{ pascalize .Name }}Size := int64(len({{.ValueExpression }}))
   {{ end }}
@@ -93,7 +128,7 @@
       {{- if and .IsNullable (not .IsMapNullOverride) }}
     if {{ .ValueExpression }} != nil {
       {{- end }}
-      if err := {{.ValueExpression }}.Validate(formats); err != nil {
+      if err := {{.ValueExpression }}.Validate(ctx, formats); err != nil {
         if ve, ok := err.(*errors.Validation); ok {
           return ve.ValidateName({{ if .Path }}{{ .Path }}{{ else }}""{{ end }})
         }
@@ -127,7 +162,7 @@
               {{- if and .IsNullable (not .IsMapNullOverride) }}
         if val != nil {
               {{- end }}
-          if err := val.Validate(formats); err != nil {
+          if err := val.Validate(ctx, formats); err != nil {
               return err
           }
               {{- if and .IsNullable (not .IsMapNullOverride) }}
@@ -157,6 +192,10 @@
     return err
   }
           {{- end }}
+          {{- if .ReadOnly }}
+  {{/* WIP: decide what to do here*/}}
+  // WIP yy: Implement ReadOnly for custom format 
+          {{- end }}
           {{- if and (not .IsStream) (not .IsBase64) }}{{/* TODO: IsStream and CustomFormattershould be mutually exclusive in type resolver */}}
             {{ template "validationCustomformat" . }}
           {{- end }}
@@ -175,7 +214,7 @@
             {{- if and .IsNullable (not .IsMapNullOverride) }}
       if val != nil {
             {{- end }}
-          if err := val.Validate(formats); err != nil {
+          if err := val.Validate(ctx, formats); err != nil {
               return err
           }
             {{- if and .IsNullable (not .IsMapNullOverride) }}
@@ -224,7 +263,7 @@
         if {{ .ValueExpression }} != nil {
           {{- end }}
         {{- end }}
-          if err := {{ if $.IsMap }}val{{ else }}{{ .ValueExpression }}{{ end }}.Validate(formats); err != nil {
+          if err := {{ if $.IsMap }}val{{ else }}{{ .ValueExpression }}{{ end }}.Validate(ctx, formats); err != nil {
               return err
           }
         {{- if and .IsNullable (not .IsMapNullOverride) }}
@@ -239,15 +278,18 @@
 {{ end }}
 
 {{define "objectvalidator" }}
-  {{/* // DEBUG
+  {{/*
+  // DEBUG
   // .Name: {{ .Name }}
   // .IsAliased: {{ .IsAliased }}
   // .IsAnonymous: {{ .IsAnonymous }}
   // .IsNullable: {{ .IsNullable }}
   // .Required: {{ .Required }}
+  // .ReadOnly: {{ .ReadOnly }}
   // .IsBaseType: {{ .IsBaseType }}
   // .ValueExpression: {{ .ValueExpression }}
-  // .ReceiverName: {{ .ReceiverName }} */}}
+  // .ReceiverName: {{ .ReceiverName }}
+  */}}
   {{- if not .IsAnonymous }}
     {{- if and .Required (or .IsNullable .IsBaseType) }}
       if err := validate.Required({{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{.ValueExpression }}); err != nil {
@@ -263,7 +305,7 @@
       {{- if and .IsNullable (not .IsMapNullOverride) }}
       if {{ .ValueExpression }} != nil {
       {{- end }}
-      if err := {{.ValueExpression }}.Validate(formats); err != nil {
+      if err := {{.ValueExpression }}.Validate(ctx, formats); err != nil {
         if ve, ok := err.(*errors.Validation); ok {
           return ve.ValidateName({{ if .Path }}{{ .Path }}{{ else }}""{{ end }})
         }
@@ -302,6 +344,10 @@
     return err
   }
     {{- end }}
+    {{- if .ReadOnly }}
+    {{/*WIP yy: decide what to do here*/}}
+  // WIP: READONLY for custom formatter. 
+    {{- end }}
     {{- if and (not .IsStream) (not .IsBase64) }}
       {{ template "validationCustomformat" . }}
     {{- end }}
@@ -322,6 +368,10 @@
   if err := validate.Required{{ if and (eq .GoType "string") (not .IsNullable) }}String{{ end }}({{ if .Path }}{{ .Path }}{{ else }}""{{ end }}, {{ printf "%q" .Location }}, {{ if not (or .IsAnonymous .IsNullable) }}{{ .GoType }}({{ end }}{{.ValueExpression }}{{ if not (or .IsAnonymous .IsNullable) }}){{ end }}); err != nil {
     return err
   }
+    {{- end }}
+    {{- if .ReadOnly }}
+      {{/*WIP yy: decide what to do here*/}}
+  // WIP: READONLY for custom formatter. 
     {{- end }}
     {{- if and (not .IsStream) (not .IsBase64) }}
       {{ template "validationCustomformat" . }}
@@ -408,7 +458,7 @@ func ({{ .ReceiverName }} *{{ if .IsExported }}{{ pascalize .Name }}{{ else }}{{
     {{- end }}
   {{ end }}
 // Validate validates this {{ humanize .Name }}
-func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalProperties }}*{{ end }}{{ if .Discriminates }}{{ camelize .Name }}{{ else if .IsExported }}{{ pascalize .Name }}{{ else }}{{ .Name }}{{ end }}) Validate(formats strfmt.Registry) error {
+func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalProperties }}*{{ end }}{{ if .Discriminates }}{{ camelize .Name }}{{ else if .IsExported }}{{ pascalize .Name }}{{ else }}{{ .Name }}{{ end }}) Validate(ctx context.Context, formats strfmt.Registry) error {
   var res []error
 
   {{ range .AllOf }}
@@ -420,7 +470,7 @@ func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalPropert
 
       {{ range .Properties }}
         {{ if and (ne $.DiscriminatorField .Name) (or .Required .HasValidations) }}
-          if err := {{.ReceiverName }}.validate{{ pascalize .Name }}(formats); err != nil {
+          if err := {{.ReceiverName }}.validate{{ pascalize .Name }}(ctx, formats); err != nil {
             res = append(res, err)
           }
         {{- end }}
@@ -429,12 +479,12 @@ func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalPropert
         {{ template "mapvalidator" . }}
       {{- end }}
       {{ if and .IsTuple .AdditionalItems }}
-      if err := {{ .ReceiverName }}.validate{{ pascalize .Name }}Items(formats); err != nil {
+      if err := {{ .ReceiverName }}.validate{{ pascalize .Name }}Items(ctx, formats); err != nil {
         res = append(res, err)
       }
       {{ end }}
     {{- else if (or .Required .HasValidations) }}
-      if err := {{ .ReceiverName }}.{{ pascalize (dropPackage .GoType) }}.Validate(formats); err != nil {
+      if err := {{ .ReceiverName }}.{{ pascalize (dropPackage .GoType) }}.Validate(ctx, formats); err != nil {
         res = append(res, err)
       }
     {{- end }}
@@ -442,7 +492,7 @@ func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalPropert
   {{ template "fieldvalidator" . }}
   {{ range .Properties }}
     {{ if and (ne $.DiscriminatorField .Name) (or .Required .HasValidations) }}
-      if err := {{.ReceiverName }}.validate{{ pascalize .Name }}(formats); err != nil {
+      if err := {{.ReceiverName }}.validate{{ pascalize .Name }}(ctx, formats); err != nil {
         res = append(res, err)
       }
     {{ end }}
@@ -451,7 +501,7 @@ func ({{.ReceiverName }} {{ if or .IsTuple .IsComplexObject .IsAdditionalPropert
     {{ template "mapvalidator" . }}
   {{- end }}
   {{ if and .IsTuple .AdditionalItems }}{{/* validates additionalItems in a tuple */}}
-    if err := {{ .ReceiverName }}.validate{{ pascalize .Name }}Items(formats); err != nil {
+    if err := {{ .ReceiverName }}.validate{{ pascalize .Name }}Items(ctx, formats); err != nil {
       res = append(res, err)
     }
   {{ end }}
@@ -568,7 +618,7 @@ func ({{ .ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else 
       {{ end }}
 
       {{ if and (ne $.DiscriminatorField .Name) (or .Required .HasValidations) }}
-func ({{.ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else if $.IsExported }}{{ pascalize $.Name }}{{ else }}{{ $.Name }}{{ end }}) validate{{ pascalize .Name }}(formats strfmt.Registry) error {
+func ({{.ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else if $.IsExported }}{{ pascalize $.Name }}{{ else }}{{ $.Name }}{{ end }}) validate{{ pascalize .Name }}(ctx context.Context, formats strfmt.Registry) error {
         {{ if not .Required }}
   if swag.IsZero({{ .ValueExpression }}) { // not required
     return nil
@@ -579,6 +629,8 @@ func ({{.ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else i
     return err
   }
         {{- end }}
+
+        {{/* WIP yy: Do we need ReadOnly Validation here for Tuple and Map?  */}}
         {{template "propertyvalidator" . }}
 
   return nil
@@ -676,7 +728,7 @@ func ({{ .ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else 
         {{ end }}
 
 
-func ({{.ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else if $.IsExported }}{{ pascalize $.Name }}{{ else }}{{ $.Name }}{{ end }}) validate{{ pascalize .Name }}(formats strfmt.Registry) error {
+func ({{.ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else if $.IsExported }}{{ pascalize $.Name }}{{ else }}{{ $.Name }}{{ end }}) validate{{ pascalize .Name }}(ctx context.Context, formats strfmt.Registry) error {
         {{ if not .Required }}
   if swag.IsZero({{ .ValueExpression }}) { // not required
     return nil
@@ -711,7 +763,7 @@ func ({{ .ReceiverName }} *{{ if $.Discriminates }}{{ camelize $.Name }}{{ else 
   return nil
 }
     {{ end }}
-func ({{.ReceiverName }} *{{ pascalize .Name }}) validate{{ pascalize .Name }}Items(formats strfmt.Registry) error {
+func ({{.ReceiverName }} *{{ pascalize .Name }}) validate{{ pascalize .Name }}Items(ctx context.Context, formats strfmt.Registry) error {
     {{ if or .AdditionalItems.Required .AdditionalItems.HasValidations }}
   for {{ .IndexVar }} := range {{ .ValueExpression }}.{{ pascalize .Name }}Items {
       {{template "propertyvalidator" .AdditionalItems }}
