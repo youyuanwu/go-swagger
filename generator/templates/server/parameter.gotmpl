@@ -7,6 +7,11 @@
   if err := body.Validate(route.Formats); err != nil {
     res = append(res, err)
   }
+  // WIP: Uncomment once https://github.com/go-openapi/validate/pull/127 is approved
+  // ctx := validate.WithOperationRequest(context.Background())
+  // if err := body.ContextValidate(ctx, route.Formats); err != nil {
+  //  res = append(res, err)
+  // }
 
   if len(res) == 0 {
     {{ .ReceiverName }}.{{ pascalize .Name }} = {{ if and (not .Schema.IsBaseType) .IsNullable }}&{{ end }}body
