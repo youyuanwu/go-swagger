@@ -23,7 +23,11 @@ func (i *TodosHandlerImpl) AddOne(params todos.AddOneParams, principal interface
 	defer i.lock.Unlock()
 	newItem := params.Body
 	if newItem == nil {
-		return todos.NewAddOneDefault(http.StatusBadRequest).WithPayload(&models.Error{})
+		return todos.NewAddOneDefault(http.StatusBadRequest).
+			WithPayload(&models.Error{
+				Code:    http.StatusBadRequest,
+				Message: &[]string{"Item Body is nil"}[0],
+			})
 	}
 	// assign new id
 	newItem.ID = i.idx
