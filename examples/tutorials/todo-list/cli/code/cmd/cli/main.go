@@ -4,6 +4,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
@@ -14,7 +15,12 @@ import (
 // Editing this file might prove futile when you re-run the swagger generate command
 
 func main() {
-	rootCmd := cli.MakeRootCmd()
+	rootCmd, err := cli.MakeRootCmd()
+	if err != nil {
+		fmt.Println("Cmd construction error: ", err)
+		os.Exit(1)
+	}
+
 	if err := rootCmd.Execute(); err != nil {
 		log.Print("Error:", err)
 		// print the whole struct as json if possible

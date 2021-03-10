@@ -84,7 +84,7 @@ func DefaultSectionOpts(gen *GenOpts) {
 
 	if len(sec.Operations) == 0 {
 		if gen.IsClient {
-			sec.Operations = []TemplateOpts{
+			opts := []TemplateOpts{
 				{
 					Name:     "parameters",
 					Source:   "asset:clientParameter",
@@ -98,6 +98,15 @@ func DefaultSectionOpts(gen *GenOpts) {
 					FileName: "{{ (snakize (pascalize .Name)) }}_responses.go",
 				},
 			}
+			if gen.IncludeCLi {
+				opts = append(opts, TemplateOpts{
+					Name:     "clioperation",
+					Source:   "asset:cliOperation",
+					Target:   "{{ joinFilePath .Target (toPackagePath .CliPackage) }}",
+					FileName: "{{ (snakize (pascalize .Name)) }}_operation.go",
+				})
+			}
+			sec.Operations = opts
 		} else {
 			ops := []TemplateOpts{}
 			if gen.IncludeParameters {

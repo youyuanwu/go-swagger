@@ -199,9 +199,10 @@ func defaultAssets() map[string][]byte {
 		"markdown/docs.gotmpl": MustAsset("templates/markdown/docs.gotmpl"),
 
 		// cli templates
-		"cli/cli.gotmpl":      MustAsset("templates/cli/cli.gotmpl"),
-		"cli/main.gotmpl":     MustAsset("templates/cli/main.gotmpl"),
-		"cli/modelcli.gotmpl": MustAsset("templates/cli/modelcli.gotmpl"),
+		"cli/cli.gotmpl":       MustAsset("templates/cli/cli.gotmpl"),
+		"cli/main.gotmpl":      MustAsset("templates/cli/main.gotmpl"),
+		"cli/modelcli.gotmpl":  MustAsset("templates/cli/modelcli.gotmpl"),
+		"cli/operation.gotmpl": MustAsset("templates/cli/operation.gotmpl"),
 	}
 }
 

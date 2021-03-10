@@ -18,7 +18,7 @@ func addItemCmd(cmdPrefix string, cmd *cobra.Command) error {
 	// property completed
 	// TODO: not copy paste
 	{
-		cmdString := fmt.Sprintf("%vCompleted", cmdPrefix)
+		cmdString := fmt.Sprintf("%v.completed", cmdPrefix)
 		_ = cmd.PersistentFlags().Bool(cmdString, false, "")
 
 	}
@@ -26,7 +26,7 @@ func addItemCmd(cmdPrefix string, cmd *cobra.Command) error {
 	// property description
 	// TODO: not copy paste
 	{
-		cmdString := fmt.Sprintf("%vDescription", cmdPrefix)
+		cmdString := fmt.Sprintf("%v.description", cmdPrefix)
 		_ = cmd.PersistentFlags().String(cmdString, "", "Required. ")
 
 		if err := cmd.MarkPersistentFlagRequired(cmdString); err != nil {
@@ -38,7 +38,7 @@ func addItemCmd(cmdPrefix string, cmd *cobra.Command) error {
 	// property id
 	// TODO: not copy paste
 	{
-		cmdString := fmt.Sprintf("%vID", cmdPrefix)
+		cmdString := fmt.Sprintf("%v.id", cmdPrefix)
 		_ = cmd.PersistentFlags().Int64(cmdString, 0, "")
 
 	}
@@ -46,13 +46,13 @@ func addItemCmd(cmdPrefix string, cmd *cobra.Command) error {
 	return nil
 }
 
-// retrieve flags from commands, and set value in model . return true if user passed flag, i.e. field is added to model
-func execItemCmd(m *models.Item, cmdPrefix string, cmd *cobra.Command) (error, bool) {
+// retrieve flags from commands, and set value in model. Return true if any flag is passed by user to fill model field.
+func retrieveItemFlags(m *models.Item, cmdPrefix string, cmd *cobra.Command) (error, bool) {
 	retAdded := false
 
 	// property completed
 	{
-		cmdString := fmt.Sprintf("%vCompleted", cmdPrefix)
+		cmdString := fmt.Sprintf("%v.completed", cmdPrefix)
 		if cmd.Flags().Changed(cmdString) { // only
 			temp, err := cmd.Flags().GetBool(cmdString)
 			if err != nil {
@@ -65,7 +65,7 @@ func execItemCmd(m *models.Item, cmdPrefix string, cmd *cobra.Command) (error, b
 
 	// property description
 	{
-		cmdString := fmt.Sprintf("%vDescription", cmdPrefix)
+		cmdString := fmt.Sprintf("%v.description", cmdPrefix)
 		if cmd.Flags().Changed(cmdString) { // only
 			temp, err := cmd.Flags().GetString(cmdString)
 			if err != nil {
@@ -78,7 +78,7 @@ func execItemCmd(m *models.Item, cmdPrefix string, cmd *cobra.Command) (error, b
 
 	// property id
 	{
-		cmdString := fmt.Sprintf("%vID", cmdPrefix)
+		cmdString := fmt.Sprintf("%v.id", cmdPrefix)
 		if cmd.Flags().Changed(cmdString) { // only
 			temp, err := cmd.Flags().GetInt64(cmdString)
 			if err != nil {

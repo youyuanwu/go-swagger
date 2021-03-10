@@ -18,7 +18,7 @@ func addErrorCmd(cmdPrefix string, cmd *cobra.Command) error {
 	// property code
 	// TODO: not copy paste
 	{
-		cmdString := fmt.Sprintf("%vCode", cmdPrefix)
+		cmdString := fmt.Sprintf("%v.code", cmdPrefix)
 		_ = cmd.PersistentFlags().Int64(cmdString, 0, "")
 
 	}
@@ -26,7 +26,7 @@ func addErrorCmd(cmdPrefix string, cmd *cobra.Command) error {
 	// property message
 	// TODO: not copy paste
 	{
-		cmdString := fmt.Sprintf("%vMessage", cmdPrefix)
+		cmdString := fmt.Sprintf("%v.message", cmdPrefix)
 		_ = cmd.PersistentFlags().String(cmdString, "", "Required. ")
 
 		if err := cmd.MarkPersistentFlagRequired(cmdString); err != nil {
@@ -38,13 +38,13 @@ func addErrorCmd(cmdPrefix string, cmd *cobra.Command) error {
 	return nil
 }
 
-// retrieve flags from commands, and set value in model . return true if user passed flag, i.e. field is added to model
-func execErrorCmd(m *models.Error, cmdPrefix string, cmd *cobra.Command) (error, bool) {
+// retrieve flags from commands, and set value in model. Return true if any flag is passed by user to fill model field.
+func retrieveErrorFlags(m *models.Error, cmdPrefix string, cmd *cobra.Command) (error, bool) {
 	retAdded := false
 
 	// property code
 	{
-		cmdString := fmt.Sprintf("%vCode", cmdPrefix)
+		cmdString := fmt.Sprintf("%v.code", cmdPrefix)
 		if cmd.Flags().Changed(cmdString) { // only
 			temp, err := cmd.Flags().GetInt64(cmdString)
 			if err != nil {
@@ -57,7 +57,7 @@ func execErrorCmd(m *models.Error, cmdPrefix string, cmd *cobra.Command) (error,
 
 	// property message
 	{
-		cmdString := fmt.Sprintf("%vMessage", cmdPrefix)
+		cmdString := fmt.Sprintf("%v.message", cmdPrefix)
 		if cmd.Flags().Changed(cmdString) { // only
 			temp, err := cmd.Flags().GetString(cmdString)
 			if err != nil {

@@ -13,10 +13,10 @@ clean:
 	rm -rf ${SRC}
 
 run:
-	go run ${SRC}/cmd/cli/main.go --hostname localhost:12345 --x-todolist-token "example token" Todos AddOne --ItemDescription "hi" --help
+	go run ${SRC}/cmd/cli/main.go --hostname localhost:12345 --x-todolist-token "example token" todos addOne --item.description "hi"
 	
 run-get:
-	go run ${SRC}/cmd/cli/main.go --hostname localhost:12345 --x-todolist-token "example token" Todos FindTodos
+	go run ${SRC}/cmd/cli/main.go --hostname localhost:12345 --x-todolist-token "example token" todos findTodos
 
 run-update:
 	go run ${SRC}/cmd/cli/main.go --hostname localhost:12345 --x-todolist-token "example token" Todos UpdateOne --id 1 --ItemCompleted true --ItemDescription "done"

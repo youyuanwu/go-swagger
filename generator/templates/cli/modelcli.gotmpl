@@ -31,7 +31,7 @@ func add{{pascalize .Name}}Cmd(cmdPrefix string, cmd *cobra.Command) error {
 		{{- else}}
 			{{- $fullDescription = printf "%v" .Description}}
 		{{- end}}
-        cmdString := fmt.Sprintf("%v{{ pascalize .Name }}", cmdPrefix)
+        cmdString := fmt.Sprintf("%v.{{ .Name }}", cmdPrefix)
         {{- if .IsPrimitive }}
             {{- if eq .GoType "int64" }}
                 _ = cmd.PersistentFlags().Int64(cmdString, {{ if .Default }}{{ printf "%#v" .Default }}{{else}}0{{end}}, "{{ $fullDescription }}")
@@ -67,8 +67,8 @@ func add{{pascalize .Name}}Cmd(cmdPrefix string, cmd *cobra.Command) error {
 }
 
 
-// retrieve flags from commands, and set value in model . return true if user passed flag, i.e. field is added to model
-func exec{{pascalize .Name}}Cmd({{.ReceiverName}} *{{.Package}}.{{.GoType}}, cmdPrefix string, cmd *cobra.Command) (error, bool) {
+// retrieve flags from commands, and set value in model. Return true if any flag is passed by user to fill model field.
+func retrieve{{pascalize .Name}}Flags({{.ReceiverName}} *{{.Package}}.{{.GoType}}, cmdPrefix string, cmd *cobra.Command) (error, bool) {
     retAdded := false
 	{{ range .AllOf }}
     // allOf {{.Name}}
@@ -76,7 +76,7 @@ func exec{{pascalize .Name}}Cmd({{.ReceiverName}} *{{.Package}}.{{.GoType}}, cmd
     {{ range .Properties }}
     // property {{.Name}}
     { 
-        cmdString := fmt.Sprintf("%v{{ pascalize .Name }}", cmdPrefix)
+        cmdString := fmt.Sprintf("%v.{{ .Name }}", cmdPrefix)
         if cmd.Flags().Changed(cmdString) { // only 
         {{- if .IsPrimitive }}
             temp, err := cmd.Flags().Get{{pascalize .GoType}}(cmdString)
@@ -88,7 +88,6 @@ func exec{{pascalize .Name}}Cmd({{.ReceiverName}} *{{.Package}}.{{.GoType}}, cmd
             // struct
             temp := {{.Package}}.{{.GoType}}{}
             err, added := exec{{.Name}}Cmd(temp, cmdString, cmd)
-            // todo detect added or not
             retAdded = retAdded || added
         {{- end }}
         if err != nil{
